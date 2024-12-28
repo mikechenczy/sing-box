@@ -1,5 +1,5 @@
 用
-go build -tags "with_shadowsocksr" ./cmd/sing-box
+go build -tags "with_shadowsocksr with_quic" ./cmd/sing-box
 进行构建
 
 修改了一些项目，使支持ss的chacha20：
