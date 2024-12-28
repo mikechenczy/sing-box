@@ -6,8 +6,6 @@ import (
 
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
-	"github.com/sagernet/sing/common"
-	"github.com/sagernet/sing/common/json/badoption"
 )
 
 func TestHysteriaSelf(t *testing.T) {
@@ -17,18 +15,18 @@ func TestHysteriaSelf(t *testing.T) {
 			{
 				Type: C.TypeMixed,
 				Tag:  "mixed-in",
-				Options: &option.HTTPMixedInboundOptions{
+				MixedOptions: option.HTTPMixedInboundOptions{
 					ListenOptions: option.ListenOptions{
-						Listen:     common.Ptr(badoption.Addr(netip.IPv4Unspecified())),
+						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
 						ListenPort: clientPort,
 					},
 				},
 			},
 			{
 				Type: C.TypeHysteria,
-				Options: &option.HysteriaInboundOptions{
+				HysteriaOptions: option.HysteriaInboundOptions{
 					ListenOptions: option.ListenOptions{
-						Listen:     common.Ptr(badoption.Addr(netip.IPv4Unspecified())),
+						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
 						ListenPort: serverPort,
 					},
 					UpMbps:   100,
@@ -37,13 +35,11 @@ func TestHysteriaSelf(t *testing.T) {
 						AuthString: "password",
 					}},
 					Obfs: "fuck me till the daylight",
-					InboundTLSOptionsContainer: option.InboundTLSOptionsContainer{
-						TLS: &option.InboundTLSOptions{
-							Enabled:         true,
-							ServerName:      "example.org",
-							CertificatePath: certPem,
-							KeyPath:         keyPem,
-						},
+					TLS: &option.InboundTLSOptions{
+						Enabled:         true,
+						ServerName:      "example.org",
+						CertificatePath: certPem,
+						KeyPath:         keyPem,
 					},
 				},
 			},
@@ -55,7 +51,7 @@ func TestHysteriaSelf(t *testing.T) {
 			{
 				Type: C.TypeHysteria,
 				Tag:  "hy-out",
-				Options: &option.HysteriaOutboundOptions{
+				HysteriaOptions: option.HysteriaOutboundOptions{
 					ServerOptions: option.ServerOptions{
 						Server:     "127.0.0.1",
 						ServerPort: serverPort,
@@ -64,12 +60,10 @@ func TestHysteriaSelf(t *testing.T) {
 					DownMbps:   100,
 					AuthString: "password",
 					Obfs:       "fuck me till the daylight",
-					OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{
-						TLS: &option.OutboundTLSOptions{
-							Enabled:         true,
-							ServerName:      "example.org",
-							CertificatePath: certPem,
-						},
+					TLS: &option.OutboundTLSOptions{
+						Enabled:         true,
+						ServerName:      "example.org",
+						CertificatePath: certPem,
 					},
 				},
 			},
@@ -77,24 +71,15 @@ func TestHysteriaSelf(t *testing.T) {
 		Route: &option.RouteOptions{
 			Rules: []option.Rule{
 				{
-					Type: C.RuleTypeDefault,
 					DefaultOptions: option.DefaultRule{
-						RawDefaultRule: option.RawDefaultRule{
-							Inbound: []string{"mixed-in"},
-						},
-						RuleAction: option.RuleAction{
-							Action: C.RuleActionTypeRoute,
-
-							RouteOptions: option.RouteActionOptions{
-								Outbound: "hy-out",
-							},
-						},
+						Inbound:  []string{"mixed-in"},
+						Outbound: "hy-out",
 					},
 				},
 			},
 		},
 	})
-	testSuit(t, clientPort, testPort)
+	testSuitSimple1(t, clientPort, testPort)
 }
 
 func TestHysteriaInbound(t *testing.T) {
@@ -103,9 +88,9 @@ func TestHysteriaInbound(t *testing.T) {
 		Inbounds: []option.Inbound{
 			{
 				Type: C.TypeHysteria,
-				Options: &option.HysteriaInboundOptions{
+				HysteriaOptions: option.HysteriaInboundOptions{
 					ListenOptions: option.ListenOptions{
-						Listen:     common.Ptr(badoption.Addr(netip.IPv4Unspecified())),
+						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
 						ListenPort: serverPort,
 					},
 					UpMbps:   100,
@@ -114,13 +99,11 @@ func TestHysteriaInbound(t *testing.T) {
 						AuthString: "password",
 					}},
 					Obfs: "fuck me till the daylight",
-					InboundTLSOptionsContainer: option.InboundTLSOptionsContainer{
-						TLS: &option.InboundTLSOptions{
-							Enabled:         true,
-							ServerName:      "example.org",
-							CertificatePath: certPem,
-							KeyPath:         keyPem,
-						},
+					TLS: &option.InboundTLSOptions{
+						Enabled:         true,
+						ServerName:      "example.org",
+						CertificatePath: certPem,
+						KeyPath:         keyPem,
 					},
 				},
 			},
@@ -135,7 +118,7 @@ func TestHysteriaInbound(t *testing.T) {
 			caPem:                  "/etc/hysteria/ca.pem",
 		},
 	})
-	testSuit(t, clientPort, testPort)
+	testSuitSimple1(t, clientPort, testPort)
 }
 
 func TestHysteriaOutbound(t *testing.T) {
@@ -154,9 +137,9 @@ func TestHysteriaOutbound(t *testing.T) {
 		Inbounds: []option.Inbound{
 			{
 				Type: C.TypeMixed,
-				Options: &option.HTTPMixedInboundOptions{
+				MixedOptions: option.HTTPMixedInboundOptions{
 					ListenOptions: option.ListenOptions{
-						Listen:     common.Ptr(badoption.Addr(netip.IPv4Unspecified())),
+						Listen:     option.NewListenAddress(netip.IPv4Unspecified()),
 						ListenPort: clientPort,
 					},
 				},
@@ -165,7 +148,7 @@ func TestHysteriaOutbound(t *testing.T) {
 		Outbounds: []option.Outbound{
 			{
 				Type: C.TypeHysteria,
-				Options: &option.HysteriaOutboundOptions{
+				HysteriaOptions: option.HysteriaOutboundOptions{
 					ServerOptions: option.ServerOptions{
 						Server:     "127.0.0.1",
 						ServerPort: serverPort,
@@ -174,12 +157,10 @@ func TestHysteriaOutbound(t *testing.T) {
 					DownMbps:   100,
 					AuthString: "password",
 					Obfs:       "fuck me till the daylight",
-					OutboundTLSOptionsContainer: option.OutboundTLSOptionsContainer{
-						TLS: &option.OutboundTLSOptions{
-							Enabled:         true,
-							ServerName:      "example.org",
-							CertificatePath: certPem,
-						},
+					TLS: &option.OutboundTLSOptions{
+						Enabled:         true,
+						ServerName:      "example.org",
+						CertificatePath: certPem,
 					},
 				},
 			},

@@ -11,47 +11,38 @@ import (
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/tls"
 	C "github.com/sagernet/sing-box/constant"
-	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/buf"
 	"github.com/sagernet/sing/common/bufio"
 	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/logger"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
 	aTLS "github.com/sagernet/sing/common/tls"
 	sHttp "github.com/sagernet/sing/protocol/http"
-	"github.com/sagernet/ws"
+	"github.com/sagernet/websocket"
 )
 
 var _ adapter.V2RayServerTransport = (*Server)(nil)
 
 type Server struct {
 	ctx                 context.Context
-	logger              logger.ContextLogger
 	tlsConfig           tls.ServerConfig
 	handler             adapter.V2RayServerTransportHandler
 	httpServer          *http.Server
 	path                string
 	maxEarlyData        uint32
 	earlyDataHeaderName string
-	upgrader            ws.HTTPUpgrader
 }
 
-func NewServer(ctx context.Context, logger logger.ContextLogger, options option.V2RayWebsocketOptions, tlsConfig tls.ServerConfig, handler adapter.V2RayServerTransportHandler) (*Server, error) {
+func NewServer(ctx context.Context, options option.V2RayWebsocketOptions, tlsConfig tls.ServerConfig, handler adapter.V2RayServerTransportHandler) (*Server, error) {
 	server := &Server{
 		ctx:                 ctx,
-		logger:              logger,
 		tlsConfig:           tlsConfig,
 		handler:             handler,
 		path:                options.Path,
 		maxEarlyData:        options.MaxEarlyData,
 		earlyDataHeaderName: options.EarlyDataHeaderName,
-		upgrader: ws.HTTPUpgrader{
-			Timeout: C.TCPTimeout,
-			Header:  options.Headers.Build(),
-		},
 	}
 	if !strings.HasPrefix(server.path, "/") {
 		server.path = "/" + server.path
@@ -63,11 +54,15 @@ func NewServer(ctx context.Context, logger logger.ContextLogger, options option.
 		BaseContext: func(net.Listener) context.Context {
 			return ctx
 		},
-		ConnContext: func(ctx context.Context, c net.Conn) context.Context {
-			return log.ContextWithNewID(ctx)
-		},
 	}
 	return server, nil
+}
+
+var upgrader = websocket.Upgrader{
+	HandshakeTimeout: C.TCPTimeout,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
 }
 
 func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
@@ -91,10 +86,6 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 			return
 		}
 	} else {
-		if request.URL.Path != s.path {
-			s.invalidRequest(writer, request, http.StatusNotFound, E.New("bad path: ", request.URL.Path))
-			return
-		}
 		earlyDataStr := request.Header.Get(s.earlyDataHeaderName)
 		if earlyDataStr != "" {
 			earlyData, err = base64.RawURLEncoding.DecodeString(earlyDataStr)
@@ -104,24 +95,25 @@ func (s *Server) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 		s.invalidRequest(writer, request, http.StatusBadRequest, E.Cause(err, "decode early data"))
 		return
 	}
-	wsConn, _, _, err := ws.UpgradeHTTP(request, writer)
+	wsConn, err := upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		s.invalidRequest(writer, request, 0, E.Cause(err, "upgrade websocket connection"))
 		return
 	}
-	source := sHttp.SourceAddress(request)
-	conn = NewConn(wsConn, source, ws.StateServerSide)
+	var metadata M.Metadata
+	metadata.Source = sHttp.SourceAddress(request)
+	conn = NewServerConn(wsConn, metadata.Source.TCPAddr())
 	if len(earlyData) > 0 {
 		conn = bufio.NewCachedConn(conn, buf.As(earlyData))
 	}
-	s.handler.NewConnectionEx(request.Context(), conn, source, M.Socksaddr{}, nil)
+	s.handler.NewConnection(request.Context(), conn, metadata)
 }
 
 func (s *Server) invalidRequest(writer http.ResponseWriter, request *http.Request, statusCode int, err error) {
 	if statusCode > 0 {
 		writer.WriteHeader(statusCode)
 	}
-	s.logger.ErrorContext(request.Context(), E.Cause(err, "process connection from ", request.RemoteAddr))
+	s.handler.NewError(request.Context(), E.Cause(err, "process connection from ", request.RemoteAddr))
 }
 
 func (s *Server) Network() []string {

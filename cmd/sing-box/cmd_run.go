@@ -13,12 +13,10 @@ import (
 	"time"
 
 	"github.com/sagernet/sing-box"
-	C "github.com/sagernet/sing-box/constant"
+	"github.com/sagernet/sing-box/common/badjsonmerge"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/json"
-	"github.com/sagernet/sing/common/json/badjson"
 
 	"github.com/spf13/cobra"
 )
@@ -57,7 +55,8 @@ func readConfigAt(path string) (*OptionsEntry, error) {
 	if err != nil {
 		return nil, E.Cause(err, "read config at ", path)
 	}
-	options, err := json.UnmarshalExtendedContext[option.Options](globalCtx, configContent)
+	var options option.Options
+	err = options.UnmarshalJSON(configContent)
 	if err != nil {
 		return nil, E.Cause(err, "decode config at ", path)
 	}
@@ -107,17 +106,12 @@ func readConfigAndMerge() (option.Options, error) {
 	if len(optionsList) == 1 {
 		return optionsList[0].options, nil
 	}
-	var mergedMessage json.RawMessage
+	var mergedOptions option.Options
 	for _, options := range optionsList {
-		mergedMessage, err = badjson.MergeJSON(globalCtx, options.options.RawMessage, mergedMessage, false)
+		mergedOptions, err = badjsonmerge.MergeOptions(options.options, mergedOptions)
 		if err != nil {
 			return option.Options{}, E.Cause(err, "merge config at ", options.path)
 		}
-	}
-	var mergedOptions option.Options
-	err = mergedOptions.UnmarshalJSONContext(globalCtx, mergedMessage)
-	if err != nil {
-		return option.Options{}, E.Cause(err, "unmarshal merged config")
 	}
 	return mergedOptions, nil
 }
@@ -133,7 +127,7 @@ func create() (*box.Box, context.CancelFunc, error) {
 		}
 		options.Log.DisableColor = true
 	}
-	ctx, cancel := context.WithCancel(globalCtx)
+	ctx, cancel := context.WithCancel(context.Background())
 	instance, err := box.New(box.Options{
 		Context: ctx,
 		Options: options,
@@ -188,12 +182,9 @@ func run() error {
 			cancel()
 			closeCtx, closed := context.WithCancel(context.Background())
 			go closeMonitor(closeCtx)
-			err = instance.Close()
+			instance.Close()
 			closed()
 			if osSignal != syscall.SIGHUP {
-				if err != nil {
-					log.Error(E.Cause(err, "sing-box did not closed properly"))
-				}
 				return nil
 			}
 			break
@@ -202,7 +193,7 @@ func run() error {
 }
 
 func closeMonitor(ctx context.Context) {
-	time.Sleep(C.FatalStopTimeout)
+	time.Sleep(3 * time.Second)
 	select {
 	case <-ctx.Done():
 		return

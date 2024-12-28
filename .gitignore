@@ -1,7 +1,6 @@
 /.idea/
 /vendor/
 /*.json
-/*.srs
 /*.db
 /site/
 /bin/
@@ -14,5 +13,3 @@
 /*.xcframework/
 .DS_Store
 /config.d/
-/venv/
-

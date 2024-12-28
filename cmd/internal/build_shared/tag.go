@@ -17,12 +17,10 @@ func ReadTag() (string, error) {
 	}
 	shortCommit, _ := shell.Exec("git", "rev-parse", "--short", "HEAD").ReadOutput()
 	version := badversion.Parse(currentTagRev[1:])
+	if version.PreReleaseIdentifier == "" {
+		version.Patch++
+	}
 	return version.String() + "-" + shortCommit, nil
-}
-
-func ReadTagVersionRev() (badversion.Version, error) {
-	currentTagRev := common.Must1(shell.Exec("git", "describe", "--tags", "--abbrev=0").ReadOutput())
-	return badversion.Parse(currentTagRev[1:]), nil
 }
 
 func ReadTagVersion() (badversion.Version, error) {

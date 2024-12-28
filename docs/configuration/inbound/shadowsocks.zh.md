@@ -8,8 +8,7 @@
   ... // 监听字段
 
   "method": "2022-blake3-aes-128-gcm",
-  "password": "8JCsPssfgS8tiRwiMlhARg==",
-  "multiplex": {}
+  "password": "8JCsPssfgS8tiRwiMlhARg=="
 }
 ```
 
@@ -24,8 +23,7 @@
       "name": "sekai",
       "password": "PCD2Z4o12bKUoFa3cC97Hw=="
     }
-  ],
-  "multiplex": {}
+  ]
 }
 ```
 
@@ -43,14 +41,13 @@
       "server_port": 8080,
       "password": "PCD2Z4o12bKUoFa3cC97Hw=="
     }
-  ],
-  "multiplex": {}
+  ]
 }
 ```
 
 ### Listen Fields
 
-See [Listen Fields](/configuration/shared/listen/) for details.
+See [Listen Fields](/configuration/shared/listen) for details.
 
 ### 字段
 
@@ -85,7 +82,3 @@ See [Listen Fields](/configuration/shared/listen/) for details.
 | none          | /                                        |
 | 2022 methods  | `sing-box generate rand --base64 <密钥长度>` |
 | other methods | 任意字符串                                    |
-
-#### multiplex
-
-参阅 [多路复用](/zh/configuration/shared/multiplex#inbound)。

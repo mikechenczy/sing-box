@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/sagernet/sing-box/adapter"
-	"github.com/sagernet/sing-box/common/badtls"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
 	M "github.com/sagernet/sing/common/metadata"
@@ -43,17 +42,7 @@ func NewClient(ctx context.Context, serverAddress string, options option.Outboun
 func ClientHandshake(ctx context.Context, conn net.Conn, config Config) (Conn, error) {
 	ctx, cancel := context.WithTimeout(ctx, C.TCPTimeout)
 	defer cancel()
-	tlsConn, err := aTLS.ClientHandshake(ctx, conn, config)
-	if err != nil {
-		return nil, err
-	}
-	readWaitConn, err := badtls.NewReadWaitConn(tlsConn)
-	if err == nil {
-		return readWaitConn, nil
-	} else if err != os.ErrInvalid {
-		return nil, err
-	}
-	return tlsConn, nil
+	return aTLS.ClientHandshake(ctx, conn, config)
 }
 
 type Dialer struct {

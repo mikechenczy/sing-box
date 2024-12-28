@@ -7,8 +7,34 @@ import (
 	"time"
 
 	"github.com/sagernet/sing-box/option"
+	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
+	"github.com/sagernet/sing/service/filemanager"
 )
+
+type factoryWithFile struct {
+	Factory
+	file *os.File
+}
+
+func (f *factoryWithFile) Close() error {
+	return common.Close(
+		f.Factory,
+		common.PtrOrNil(f.file),
+	)
+}
+
+type observableFactoryWithFile struct {
+	ObservableFactory
+	file *os.File
+}
+
+func (f *observableFactoryWithFile) Close() error {
+	return common.Close(
+		f.ObservableFactory,
+		common.PtrOrNil(f.file),
+	)
+}
 
 type Options struct {
 	Context        context.Context
@@ -16,7 +42,7 @@ type Options struct {
 	Observable     bool
 	DefaultWriter  io.Writer
 	BaseTime       time.Time
-	PlatformWriter PlatformWriter
+	PlatformWriter io.Writer
 }
 
 func New(options Options) (Factory, error) {
@@ -26,8 +52,8 @@ func New(options Options) (Factory, error) {
 		return NewNOPFactory(), nil
 	}
 
+	var logFile *os.File
 	var logWriter io.Writer
-	var logFilePath string
 
 	switch logOptions.Output {
 	case "":
@@ -40,23 +66,26 @@ func New(options Options) (Factory, error) {
 	case "stdout":
 		logWriter = os.Stdout
 	default:
-		logFilePath = logOptions.Output
+		var err error
+		logFile, err = filemanager.OpenFile(options.Context, logOptions.Output, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+		if err != nil {
+			return nil, err
+		}
+		logWriter = logFile
 	}
 	logFormatter := Formatter{
 		BaseTime:         options.BaseTime,
-		DisableColors:    logOptions.DisableColor || logFilePath != "",
-		DisableTimestamp: !logOptions.Timestamp && logFilePath != "",
+		DisableColors:    logOptions.DisableColor || logFile != nil,
+		DisableTimestamp: !logOptions.Timestamp && logFile != nil,
 		FullTimestamp:    logOptions.Timestamp,
 		TimestampFormat:  "-0700 2006-01-02 15:04:05",
 	}
-	factory := NewDefaultFactory(
-		options.Context,
-		logFormatter,
-		logWriter,
-		logFilePath,
-		options.PlatformWriter,
-		options.Observable,
-	)
+	var factory Factory
+	if options.Observable {
+		factory = NewObservableFactory(logFormatter, logWriter, options.PlatformWriter)
+	} else {
+		factory = NewFactory(logFormatter, logWriter, options.PlatformWriter)
+	}
 	if logOptions.Level != "" {
 		logLevel, err := ParseLevel(logOptions.Level)
 		if err != nil {
@@ -65,6 +94,19 @@ func New(options Options) (Factory, error) {
 		factory.SetLevel(logLevel)
 	} else {
 		factory.SetLevel(LevelTrace)
+	}
+	if logFile != nil {
+		if options.Observable {
+			factory = &observableFactoryWithFile{
+				ObservableFactory: factory.(ObservableFactory),
+				file:              logFile,
+			}
+		} else {
+			factory = &factoryWithFile{
+				Factory: factory,
+				file:    logFile,
+			}
+		}
 	}
 	return factory, nil
 }

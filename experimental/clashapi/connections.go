@@ -7,14 +7,12 @@ import (
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
+	"github.com/sagernet/sing-box/common/json"
 	"github.com/sagernet/sing-box/experimental/clashapi/trafficontrol"
-	"github.com/sagernet/sing/common/json"
-	"github.com/sagernet/ws"
-	"github.com/sagernet/ws/wsutil"
+	"github.com/sagernet/websocket"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	"github.com/gofrs/uuid/v5"
 )
 
 func connectionRouter(router adapter.Router, trafficManager *trafficontrol.Manager) http.Handler {
@@ -27,13 +25,13 @@ func connectionRouter(router adapter.Router, trafficManager *trafficontrol.Manag
 
 func getConnections(trafficManager *trafficontrol.Manager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Header.Get("Upgrade") != "websocket" {
+		if !websocket.IsWebSocketUpgrade(r) {
 			snapshot := trafficManager.Snapshot()
 			render.JSON(w, r, snapshot)
 			return
 		}
 
-		conn, _, _, err := ws.UpgradeHTTP(r, w)
+		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
 		}
@@ -58,7 +56,7 @@ func getConnections(trafficManager *trafficontrol.Manager) func(w http.ResponseW
 			if err := json.NewEncoder(buf).Encode(snapshot); err != nil {
 				return err
 			}
-			return wsutil.WriteServerText(conn, buf.Bytes())
+			return conn.WriteMessage(websocket.TextMessage, buf.Bytes())
 		}
 
 		if err = sendSnapshot(); err != nil {
@@ -77,10 +75,10 @@ func getConnections(trafficManager *trafficontrol.Manager) func(w http.ResponseW
 
 func closeConnection(trafficManager *trafficontrol.Manager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		id := uuid.FromStringOrNil(chi.URLParam(r, "id"))
+		id := chi.URLParam(r, "id")
 		snapshot := trafficManager.Snapshot()
 		for _, c := range snapshot.Connections {
-			if id == c.Metadata().ID {
+			if id == c.ID() {
 				c.Close()
 				break
 			}

@@ -5,14 +5,13 @@ import (
 	"net/http/pprof"
 	"runtime"
 	"runtime/debug"
-	"strings"
 
+	"github.com/sagernet/sing-box/common/badjson"
 	"github.com/sagernet/sing-box/common/humanize"
+	"github.com/sagernet/sing-box/common/json"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/json"
-	"github.com/sagernet/sing/common/json/badjson"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -46,22 +45,14 @@ func applyDebugListenOption(options option.DebugOptions) {
 
 			encoder := json.NewEncoder(writer)
 			encoder.SetIndent("", "  ")
-			encoder.Encode(&memObject)
+			encoder.Encode(memObject)
 		})
-		r.Route("/pprof", func(r chi.Router) {
-			r.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
-				if !strings.HasSuffix(request.URL.Path, "/") {
-					http.Redirect(writer, request, request.URL.Path+"/", http.StatusMovedPermanently)
-				} else {
-					pprof.Index(writer, request)
-				}
-			})
-			r.HandleFunc("/*", pprof.Index)
-			r.HandleFunc("/cmdline", pprof.Cmdline)
-			r.HandleFunc("/profile", pprof.Profile)
-			r.HandleFunc("/symbol", pprof.Symbol)
-			r.HandleFunc("/trace", pprof.Trace)
-		})
+		r.HandleFunc("/pprof", pprof.Index)
+		r.HandleFunc("/pprof/*", pprof.Index)
+		r.HandleFunc("/pprof/cmdline", pprof.Cmdline)
+		r.HandleFunc("/pprof/profile", pprof.Profile)
+		r.HandleFunc("/pprof/symbol", pprof.Symbol)
+		r.HandleFunc("/pprof/trace", pprof.Trace)
 	})
 	debugHTTPServer = &http.Server{
 		Addr:    options.Listen,

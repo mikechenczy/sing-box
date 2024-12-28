@@ -51,12 +51,12 @@ TLS configuration, see [TLS](/configuration/shared/tls/#outbound).
 
 #### multiplex
 
-See [Multiplex](/configuration/shared/multiplex#outbound) for details.
+Multiplex configuration, see [Multiplex](/configuration/shared/multiplex).
 
 #### transport
 
-V2Ray Transport configuration, see [V2Ray Transport](/configuration/shared/v2ray-transport/).
+V2Ray Transport configuration, see [V2Ray Transport](/configuration/shared/v2ray-transport).
 
 ### Dial Fields
 
-See [Dial Fields](/configuration/shared/dial/) for details.
+See [Dial Fields](/configuration/shared/dial) for details.

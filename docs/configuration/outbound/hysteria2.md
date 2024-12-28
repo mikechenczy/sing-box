@@ -16,19 +16,14 @@
   "password": "goofy_ahh_password",
   "network": "tcp",
   "tls": {},
-  "brutal_debug": false,
   
   ... // Dial Fields
 }
 ```
 
-!!! warning "Difference from official Hysteria2"
+!!! warning ""
 
-    The official Hysteria2 supports an authentication method called **userpass**,
-    which essentially uses a combination of `<username>:<password>` as the actual password,
-    while sing-box does not provide this alias.
-    If you are planning to use sing-box with the official program,
-    please note that you will need to fill the combination as the password.
+    QUIC, which is required by Hysteria2 is not included by default, see [Installation](/#installation).
 
 ### Fields
 
@@ -78,10 +73,6 @@ Both is enabled by default.
 
 TLS configuration, see [TLS](/configuration/shared/tls/#outbound).
 
-#### brutal_debug
-
-Enable debug information logging for Hysteria Brutal CC.
-
 ### Dial Fields
 
-See [Dial Fields](/configuration/shared/dial/) for details.
+See [Dial Fields](/configuration/shared/dial) for details.

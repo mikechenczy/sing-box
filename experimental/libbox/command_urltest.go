@@ -7,12 +7,11 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/urltest"
-	"github.com/sagernet/sing-box/protocol/group"
+	"github.com/sagernet/sing-box/outbound"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/batch"
 	E "github.com/sagernet/sing/common/exceptions"
-	"github.com/sagernet/sing/common/varbin"
-	"github.com/sagernet/sing/service"
+	"github.com/sagernet/sing/common/rw"
 )
 
 func (c *CommandClient) URLTest(groupTag string) error {
@@ -25,7 +24,7 @@ func (c *CommandClient) URLTest(groupTag string) error {
 	if err != nil {
 		return err
 	}
-	err = varbin.Write(conn, binary.BigEndian, groupTag)
+	err = rw.WriteVString(conn, groupTag)
 	if err != nil {
 		return err
 	}
@@ -33,15 +32,16 @@ func (c *CommandClient) URLTest(groupTag string) error {
 }
 
 func (s *CommandServer) handleURLTest(conn net.Conn) error {
-	groupTag, err := varbin.ReadValue[string](conn, binary.BigEndian)
+	defer conn.Close()
+	groupTag, err := rw.ReadVString(conn)
 	if err != nil {
 		return err
 	}
-	serviceNow := s.service
-	if serviceNow == nil {
+	service := s.service
+	if service == nil {
 		return nil
 	}
-	abstractOutboundGroup, isLoaded := serviceNow.instance.Outbound().Outbound(groupTag)
+	abstractOutboundGroup, isLoaded := service.instance.Router().Outbound(groupTag)
 	if !isLoaded {
 		return writeError(conn, E.New("outbound group not found: ", groupTag))
 	}
@@ -49,13 +49,19 @@ func (s *CommandServer) handleURLTest(conn net.Conn) error {
 	if !isOutboundGroup {
 		return writeError(conn, E.New("outbound is not a group: ", groupTag))
 	}
-	urlTest, isURLTest := abstractOutboundGroup.(*group.URLTest)
+	urlTest, isURLTest := abstractOutboundGroup.(*outbound.URLTest)
 	if isURLTest {
 		go urlTest.CheckOutbounds()
 	} else {
-		historyStorage := service.PtrFromContext[urltest.HistoryStorage](serviceNow.ctx)
+		var historyStorage *urltest.HistoryStorage
+		if clashServer := service.instance.Router().ClashServer(); clashServer != nil {
+			historyStorage = clashServer.HistoryStorage()
+		} else {
+			return writeError(conn, E.New("Clash API is required for URLTest on non-URLTest group"))
+		}
+
 		outbounds := common.Filter(common.Map(outboundGroup.All(), func(it string) adapter.Outbound {
-			itOutbound, _ := serviceNow.instance.Outbound().Outbound(it)
+			itOutbound, _ := service.instance.Router().Outbound(it)
 			return itOutbound
 		}), func(it adapter.Outbound) bool {
 			if it == nil {
@@ -67,12 +73,12 @@ func (s *CommandServer) handleURLTest(conn net.Conn) error {
 			}
 			return true
 		})
-		b, _ := batch.New(serviceNow.ctx, batch.WithConcurrencyNum[any](10))
+		b, _ := batch.New(service.ctx, batch.WithConcurrencyNum[any](10))
 		for _, detour := range outbounds {
 			outboundToTest := detour
 			outboundTag := outboundToTest.Tag()
 			b.Go(outboundTag, func() (any, error) {
-				t, err := urltest.URLTest(serviceNow.ctx, "", outboundToTest)
+				t, err := urltest.URLTest(service.ctx, "", outboundToTest)
 				if err != nil {
 					historyStorage.DeleteURLTestHistory(outboundTag)
 				} else {

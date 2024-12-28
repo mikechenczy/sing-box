@@ -1,15 +1,3 @@
----
-icon: material/delete-clock
----
-
-!!! quote "Changes in sing-box 1.11.0"
-
-    :material-delete-clock: [sniff](#sniff)  
-    :material-delete-clock: [sniff_override_destination](#sniff_override_destination)  
-    :material-delete-clock: [sniff_timeout](#sniff_timeout)  
-    :material-delete-clock: [domain_strategy](#domain_strategy)  
-    :material-delete-clock: [udp_disable_domain_unmapping](#udp_disable_domain_unmapping)
-
 ### Structure
 
 ```json
@@ -19,26 +7,28 @@ icon: material/delete-clock
   "tcp_fast_open": false,
   "tcp_multi_path": false,
   "udp_fragment": false,
-  "udp_timeout": "5m",
-  "detour": "another-in",
   "sniff": false,
   "sniff_override_destination": false,
   "sniff_timeout": "300ms",
   "domain_strategy": "prefer_ipv6",
-  "udp_disable_domain_unmapping": false
+  "udp_timeout": 300,
+  "proxy_protocol": false,
+  "proxy_protocol_accept_no_header": false,
+  "detour": "another-in"
 }
 ```
 
 ### Fields
 
-| Field                          | Available Context                                       |
-|--------------------------------|---------------------------------------------------------|
-| `listen`                       | Needs to listen on TCP or UDP.                          |
-| `listen_port`                  | Needs to listen on TCP or UDP.                          |
-| `tcp_fast_open`                | Needs to listen on TCP.                                 |
-| `tcp_multi_path`               | Needs to listen on TCP.                                 |
-| `udp_timeout`                  | Needs to assemble UDP connections.                      |
-| `udp_disable_domain_unmapping` | Needs to listen on UDP and accept domain UDP addresses. |
+| Field                             | Available Context                                                 |
+|-----------------------------------|-------------------------------------------------------------------|
+| `listen`                          | Needs to listen on TCP or UDP.                                    |
+| `listen_port`                     | Needs to listen on TCP or UDP.                                    |
+| `tcp_fast_open`                   | Needs to listen on TCP.                                           |
+| `tcp_multi_path`                  | Needs to listen on TCP.                                           |
+| `udp_timeout`                     | Needs to assemble UDP connections, currently Tun and Shadowsocks. |
+| `proxy_protocol`                  | Needs to listen on TCP.                                           |
+| `proxy_protocol_accept_no_header` | When `proxy_protocol` enabled                                     |
 
 #### listen
 
@@ -66,23 +56,7 @@ Enable TCP Multi Path.
 
 Enable UDP fragmentation.
 
-#### udp_timeout
-
-UDP NAT expiration time.
-
-`5m` will be used by default.
-
-#### detour
-
-If set, connections will be forwarded to the specified inbound.
-
-Requires target inbound support, see [Injectable](/configuration/inbound/#fields).
-
 #### sniff
-
-!!! failure "Deprecated in sing-box 1.11.0"
-
-    Inbound fields are deprecated and will be removed in sing-box 1.13.0, check [Migration](/migration/#migrate-legacy-inbound-fields-to-rule-actions).
 
 Enable sniffing.
 
@@ -90,29 +64,17 @@ See [Protocol Sniff](/configuration/route/sniff/) for details.
 
 #### sniff_override_destination
 
-!!! failure "Deprecated in sing-box 1.11.0"
-
-    Inbound fields are deprecated and will be removed in sing-box 1.13.0.
-
 Override the connection destination address with the sniffed domain.
 
 If the domain name is invalid (like tor), this will not work.
 
 #### sniff_timeout
 
-!!! failure "Deprecated in sing-box 1.11.0"
-
-    Inbound fields are deprecated and will be removed in sing-box 1.13.0, check [Migration](/migration/#migrate-legacy-inbound-fields-to-rule-actions).
-
 Timeout for sniffing.
 
-`300ms` is used by default.
+300ms is used by default.
 
 #### domain_strategy
-
-!!! failure "Deprecated in sing-box 1.11.0"
-
-    Inbound fields are deprecated and will be removed in sing-box 1.13.0, check [Migration](/migration/#migrate-legacy-inbound-fields-to-rule-actions).
 
 One of `prefer_ipv4` `prefer_ipv6` `ipv4_only` `ipv6_only`.
 
@@ -120,14 +82,20 @@ If set, the requested domain name will be resolved to IP before routing.
 
 If `sniff_override_destination` is in effect, its value will be taken as a fallback.
 
-#### udp_disable_domain_unmapping
+#### udp_timeout
 
-!!! failure "Deprecated in sing-box 1.11.0"
+UDP NAT expiration time in seconds, default is 300 (5 minutes).
 
-    Inbound fields are deprecated and will be removed in sing-box 1.13.0, check [Migration](/migration/#migrate-legacy-inbound-fields-to-rule-actions).
+#### proxy_protocol
 
-If enabled, for UDP proxy requests addressed to a domain, 
-the original packet address will be sent in the response instead of the mapped domain.
+Parse [Proxy Protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt) in the connection header.
 
-This option is used for compatibility with clients that 
-do not support receiving UDP packets with domain addresses, such as Surge.
+#### proxy_protocol_accept_no_header
+
+Accept connections without Proxy Protocol header.
+
+#### detour
+
+If set, connections will be forwarded to the specified inbound.
+
+Requires target inbound support, see [Injectable](/configuration/inbound/#fields).

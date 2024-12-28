@@ -1,11 +1,3 @@
----
-icon: material/alert-decagram
----
-
-!!! quote "sing-box 1.10.0 中的更改"
-
-    :material-alert-decagram: [utls](#utls)  
-
 ### 入站
 
 ```json
@@ -48,8 +40,8 @@ icon: material/alert-decagram
     "handshake": {
       "server": "google.com",
       "server_port": 443,
-      ...
-      // 拨号字段
+
+      ... // 拨号字段
     },
     "private_key": "UuMBgl7MXTPx9inmQp2UC7Jcnwc6XYbwDNebonM-FCc",
     "short_id": [
@@ -170,9 +162,12 @@ TLS 版本值：
 
 #### cipher_suites
 
-启用的 TLS 1.0-1.2密码套件的列表。列表的顺序被忽略。请注意，TLS 1.3 的密码套件是不可配置的。
+将在 ECDHE 握手中使用的椭圆曲线，按优先顺序排列。
 
-如果为空，则使用安全的默认列表。默认密码套件可能会随着时间的推移而改变。
+如果为空，将使用默认值。
+
+客户端将使用第一个首选项作为其在 TLS 1.3 中的密钥共享类型。
+这在未来可能会改变。
 
 #### certificate
 
@@ -180,19 +175,11 @@ TLS 版本值：
 
 #### certificate_path
 
-!!! note ""
-
-    文件更改时将自动重新加载。
-
 服务器 PEM 证书路径。
 
 #### key
 
 ==仅服务器==
-
-!!! note ""
-
-    文件更改时将自动重新加载。
 
 服务器 PEM 私钥行数组。
 
@@ -206,23 +193,17 @@ TLS 版本值：
 
 ==仅客户端==
 
-!!! failure ""
+!!! warning ""
 
-    没有证据表明 GFW 根据 TLS 客户端指纹检测并阻止服务器，并且，使用一个未经安全审查的不完美模拟可能带来安全隐患。
+    默认安装不包含 uTLS, 参阅 [安装](/zh/#_2)。
+
+!!! note ""
+
+    uTLS 维护不善且其效果可能未经证实，使用风险自负。
 
 uTLS 是 "crypto/tls" 的一个分支，它提供了 ClientHello 指纹识别阻力。
 
 可用的指纹值：
-
-!!! warning "已在 sing-box 1.10.0 移除"
-
-    一些旧 chrome 指纹已被删除，并将会退到 chrome：
-
-    :material-close: chrome_psk  
-    :material-close: chrome_psk_shuffle  
-    :material-close: chrome_padding_psk_shuffle  
-    :material-close: chrome_pq  
-    :material-close: chrome_pq_psk
 
 * chrome
 * firefox
@@ -239,8 +220,13 @@ uTLS 是 "crypto/tls" 的一个分支，它提供了 ClientHello 指纹识别阻
 
 ## ECH 字段
 
+!!! warning ""
+
+    默认安装不包含 ECH, 参阅 [安装](/zh/#_2)。
+
 ECH (Encrypted Client Hello) 是一个 TLS 扩展，它允许客户端加密其 ClientHello 的第一部分
 信息。
+
 
 ECH 配置和密钥可以通过 `sing-box generate ech-keypair [--pq-signature-schemes-enabled]` 生成。
 
@@ -267,10 +253,6 @@ ECH PEM 密钥行数组
 
 ==仅服务器==
 
-!!! note ""
-
-    文件更改时将自动重新加载。
-
 ECH PEM 密钥路径
 
 #### config
@@ -290,6 +272,10 @@ ECH PEM 配置路径
 如果为空，将尝试从 DNS 加载。
 
 ### ACME 字段
+
+!!! warning ""
+
+    默认安装不包含 ACME，参阅 [安装](/zh/#_2)。
 
 #### domain
 
@@ -358,9 +344,17 @@ MAC 密钥。
 
 ACME DNS01 验证字段。如果配置，将禁用其他验证方法。
 
-参阅 [DNS01 验证字段](/configuration/shared/dns01_challenge/)。
+参阅 [DNS01 验证字段](/configuration/shared/dns01_challenge)。
 
 ### Reality 字段
+
+!!! warning ""
+
+    默认安装不包含 reality 服务器，参阅 [安装](/zh/#_2)。
+
+!!! warning ""
+
+    默认安装不包含被 reality 客户端需要的 uTLS, 参阅 [安装](/zh/#_2)。
 
 #### handshake
 
@@ -397,3 +391,7 @@ ACME DNS01 验证字段。如果配置，将禁用其他验证方法。
 服务器与和客户端之间允许的最大时间差。
 
 默认禁用检查。
+
+### 重载
+
+对于服务器配置，如果修改，证书和密钥将自动重新加载。

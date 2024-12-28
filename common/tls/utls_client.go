@@ -217,8 +217,6 @@ func init() {
 
 func uTLSClientHelloID(name string) (utls.ClientHelloID, error) {
 	switch name {
-	case "chrome_psk", "chrome_psk_shuffle", "chrome_padding_psk_shuffle", "chrome_pq":
-		fallthrough
 	case "chrome", "":
 		return utls.HelloChrome_Auto, nil
 	case "firefox":

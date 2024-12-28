@@ -1,14 +1,8 @@
-### 入站
+### 服务器要求
 
-```json
-{
-  "enabled": true,
-  "padding": false,
-  "brutal": {}
-}
-```
+`sing-box` :)
 
-### 出站
+### 结构
 
 ```json
 {
@@ -16,27 +10,11 @@
   "protocol": "smux",
   "max_connections": 4,
   "min_streams": 4,
-  "max_streams": 0,
-  "padding": false,
-  "brutal": {}
+  "max_streams": 0
 }
 ```
 
-### 入站字段
-
-#### enabled
-
-启用多路复用支持。
-
-#### padding
-
-如果启用，将拒绝非填充连接。
-
-#### brutal
-
-参阅 [TCP Brutal](/zh/configuration/shared/tcp-brutal/)。
-
-### 出站字段
+### 字段
 
 #### enabled
 
@@ -80,6 +58,3 @@
 
 启用填充。
 
-#### brutal
-
-参阅 [TCP Brutal](/zh/configuration/shared/tcp-brutal/)。

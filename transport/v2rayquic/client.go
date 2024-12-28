@@ -8,11 +8,11 @@ import (
 	"sync"
 
 	"github.com/sagernet/quic-go"
-	"github.com/sagernet/quic-go/http3"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/common/tls"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
+	"github.com/sagernet/sing-box/transport/hysteria"
 	"github.com/sagernet/sing-quic"
 	"github.com/sagernet/sing/common"
 	"github.com/sagernet/sing/common/bufio"
@@ -38,7 +38,7 @@ func NewClient(ctx context.Context, dialer N.Dialer, serverAddr M.Socksaddr, opt
 		DisablePathMTUDiscovery: !C.IsLinux && !C.IsWindows,
 	}
 	if len(tlsConfig.NextProtos()) == 0 {
-		tlsConfig.SetNextProtos([]string{http3.NextProtoH3})
+		tlsConfig.SetNextProtos([]string{"h2", "http/1.1"})
 	}
 	return &Client{
 		ctx:        ctx,
@@ -93,19 +93,9 @@ func (c *Client) DialContext(ctx context.Context) (net.Conn, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &StreamWrapper{Conn: conn, Stream: stream}, nil
+	return &hysteria.StreamWrapper{Conn: conn, Stream: stream}, nil
 }
 
 func (c *Client) Close() error {
-	c.connAccess.Lock()
-	defer c.connAccess.Unlock()
-	if c.conn != nil {
-		c.conn.CloseWithError(0, "")
-	}
-	if c.rawConn != nil {
-		c.rawConn.Close()
-	}
-	c.conn = nil
-	c.rawConn = nil
-	return nil
+	return common.Close(c.conn, c.rawConn)
 }

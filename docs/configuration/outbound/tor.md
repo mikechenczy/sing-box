@@ -18,7 +18,7 @@
 
 !!! info ""
 
-    Embedded Tor is not included by default, see [Installation](/installation/build-from-source/#build-tags).
+    Embedded tor is not included by default, see [Installation](/#installation).
 
 ### Fields
 
@@ -48,4 +48,4 @@ See [tor(1)](https://linux.die.net/man/1/tor) for details.
 
 ### Dial Fields
 
-See [Dial Fields](/configuration/shared/dial/) for details.
+See [Dial Fields](/configuration/shared/dial) for details.

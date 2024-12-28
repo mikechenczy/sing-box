@@ -1,11 +1,3 @@
----
-icon: material/alert-decagram
----
-
-!!! quote "Changes in sing-box 1.11.0"
-
-    :material-alert: [masquerade](#masquerade)
-
 ### Structure
 
 ```json
@@ -28,22 +20,18 @@ icon: material/alert-decagram
     }
   ],
   "ignore_client_bandwidth": false,
-  "tls": {},
-  "masquerade": "", // or {}
-  "brutal_debug": false
+  "masquerade": "",
+  "tls": {}
 }
 ```
 
-!!! warning "Difference from official Hysteria2"
+!!! warning ""
 
-    The official program supports an authentication method called **userpass**,
-    which essentially uses a combination of `<username>:<password>` as the actual password,
-    while sing-box does not provide this alias.
-    To use sing-box with the official program, you need to fill in that combination as the actual password.
+    QUIC, which is required by Hysteria2 is not included by default, see [Installation](/#installation).
 
 ### Listen Fields
 
-See [Listen Fields](/configuration/shared/listen/) for details.
+See [Listen Fields](/configuration/shared/listen) for details.
 
 ### Fields
 
@@ -79,63 +67,19 @@ Commands the client to use the BBR flow control algorithm instead of Hysteria CC
 
 Conflict with `up_mbps` and `down_mbps`.
 
-#### tls
-
-==Required==
-
-TLS configuration, see [TLS](/configuration/shared/tls/#inbound).
-
 #### masquerade
 
-HTTP3 server behavior (URL string configuration) when authentication fails.
+HTTP3 server behavior when authentication fails.
 
 | Scheme       | Example                 | Description        |
 |--------------|-------------------------|--------------------|
 | `file`       | `file:///var/www`       | As a file server   |
 | `http/https` | `http://127.0.0.1:8080` | As a reverse proxy |
 
-Conflict with `masquerade.type`.
+A 404 page will be returned if empty.
 
-A 404 page will be returned if masquerade is not configured.
+#### tls
 
-#### masquerade.type
+==Required==
 
-HTTP3 server behavior (Object configuration) when authentication fails.
-
-| Type     | Description                 | Fields                              |
-|----------|-----------------------------|-------------------------------------|
-| `file`   | As a file server            | `directory`                         |
-| `proxy`  | As a reverse proxy          | `url`, `rewrite_host`               |
-| `string` | Reply with a fixed response | `status_code`, `headers`, `content` |
-
-Conflict with `masquerade`.
-
-A 404 page will be returned if masquerade is not configured.
-
-#### masquerade.directory
-
-File server root directory.
-
-#### masquerade.url
-
-Reverse proxy target URL.
-
-#### masquerade.rewrite_host
-
-Rewrite the `Host` header to the target URL.
-
-#### masquerade.status_code
-
-Fixed response status code.
-
-#### masquerade.headers
-
-Fixed response headers.
-
-#### masquerade.content
-
-Fixed response content.
-
-#### brutal_debug
-
-Enable debug information logging for Hysteria Brutal CC.
+TLS configuration, see [TLS](/configuration/shared/tls/#inbound).

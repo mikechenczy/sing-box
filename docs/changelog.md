@@ -1,1425 +1,3 @@
----
-icon: material/alert-decagram
----
-
-#### 1.11.0-beta.16
-
-* Fixes and improvements
-
-### 1.10.6
-
-* Fixes and improvements
-
-#### 1.11.0-beta.14
-
-* Allow adding route (exclude) address sets to routes **1**
-* Fixes and improvements
-
-**1**:
-
-When `auto_redirect` is not enabled, directly add `route[_exclude]_address_set`
-to tun routes (equivalent to `route[_exclude]_address`).
-
-Note that it **doesn't work on the Android graphical client** due to
-the Android VpnService not being able to handle a large number of routes (DeadSystemException),
-but otherwise it works fine on all command line clients and Apple platforms.
-
-See [route_address_set](/configuration/inbound/tun/#route_address_set) and
-[route_exclude_address_set](/configuration/inbound/tun/#route_exclude_address_set).
-
-#### 1.11.0-beta.12
-
-* Add `rule-set merge` command
-* Fixes and improvements
-
-#### 1.11.0-beta.3
-
-* Add more masquerade options for hysteria2 **1**
-* Fixes and improvements
-
-**1**:
-
-See [Hysteria2](/configuration/inbound/hysteria2/#masquerade).
-
-#### 1.11.0-alpha.25
-
-* Update quic-go to v0.48.2
-* Fixes and improvements
-
-#### 1.11.0-alpha.22
-
-* Add UDP timeout route option **1**
-* Fixes and improvements
-
-**1**:
-
-See [Rule Action](/configuration/route/rule_action/#udp_timeout).
-
-#### 1.11.0-alpha.20
-
-* Add UDP GSO support for WireGuard
-* Make GSO adaptive **1**
-
-**1**:
-
-For WireGuard outbound and endpoint, GSO will be automatically enabled when available,
-see [WireGuard Outbound](/configuration/outbound/wireguard/#gso).
-
-For TUN, GSO has been removed,
-see [Deprecated](/deprecated/#gso-option-in-tun).
-
-#### 1.11.0-alpha.19
-
-* Upgrade WireGuard outbound to endpoint **1**
-* Fixes and improvements
-
-**1**:
-
-The new WireGuard endpoint combines inbound and outbound capabilities,
-and the old outbound will be removed in sing-box 1.13.0.
-
-See [Endpoint](/configuration/endpoint/), [WireGuard Endpoint](/configuration/endpoint/wireguard/)
-and [Migrate WireGuard outbound fields to route options](/migration/#migrate-wireguard-outbound-to-endpoint).
-
-### 1.10.2
-
-* Add deprecated warnings
-* Fix proxying websocket connections in HTTP/mixed inbounds
-* Fixes and improvements
-
-#### 1.11.0-alpha.18
-
-* Fixes and improvements
-
-#### 1.11.0-alpha.16
-
-* Add `cache_capacity` DNS option **1**
-* Add `override_address` and `override_port` route options **2**
-* Fixes and improvements
-
-**1**:
-
-See [DNS](/configuration/dns/#cache_capacity).
-
-**2**:
-
-See [Rule Action](/configuration/route/#override_address) and
-[Migrate destination override fields to route options](/migration/#migrate-destination-override-fields-to-route-options).
-
-#### 1.11.0-alpha.15
-
-* Improve multi network dialing **1**
-* Fixes and improvements
-
-**1**:
-
-New options allow you to configure the network strategy flexibly.
-
-See [Dial Fields](/configuration/shared/dial/#network_strategy),
-[Rule Action](/configuration/route/rule_action/#network_strategy)
-and [Route](/configuration/route/#default_network_strategy).
-
-#### 1.11.0-alpha.14
-
-* Add multi network dialing **1**
-* Fixes and improvements
-
-**1**:
-
-Similar to Surge's strategy.
-
-New options allow you to connect using multiple network interfaces,
-prefer or only use one type of interface,
-and configure a timeout to fallback to other interfaces.
-
-See [Dial Fields](/configuration/shared/dial/#network_strategy),
-[Rule Action](/configuration/route/rule_action/#network_strategy)
-and [Route](/configuration/route/#default_network_strategy).
-
-#### 1.11.0-alpha.13
-
-* Fixes and improvements
-
-#### 1.11.0-alpha.12
-
-* Merge route options to route actions **1**
-* Add `network_type`, `network_is_expensive` and `network_is_constrainted` rule items **2**
-* Fixes and improvements
-
-**1**:
-
-Route options in DNS route actions will no longer be considered deprecated,
-see [DNS Route Action](/configuration/dns/rule_action/).
-
-Also, now `udp_disable_domain_unmapping` and `udp_connect` can also be configured in route action,
-see [Route Action](/configuration/route/rule_action/).
-
-**2**:
-
-When using in graphical clients, new routing rule items allow you to match on
-network type (WIFI, cellular, etc.), whether the network is expensive, and whether Low Data Mode is enabled.
-
-See [Route Rule](/configuration/route/rule/), [DNS Route Rule](/configuration/dns/rule/)
-and [Headless Rule](/configuration/rule-set/headless-rule/).
-
-#### 1.11.0-alpha.9
-
-* Improve tun compatibility **1**
-* Fixes and improvements
-
-**1**:
-
-When `gvisor` tun stack is enabled, even if the request passes routing,
-if the outbound connection establishment fails,
-the connection still does not need to be established and a TCP RST is replied.
-
-#### 1.11.0-alpha.7
-
-* Introducing rule actions **1**
-
-**1**:
-
-New rule actions replace legacy inbound fields and special outbound fields,
-and can be used for pre-matching **2**.
-
-See [Rule](/configuration/route/rule/),
-[Rule Action](/configuration/route/rule_action/),
-[DNS Rule](/configuration/dns/rule/) and
-[DNS Rule Action](/configuration/dns/rule_action/).
-
-For migration, see
-[Migrate legacy special outbounds to rule actions](/migration/#migrate-legacy-special-outbounds-to-rule-actions),
-[Migrate legacy inbound fields to rule actions](/migration/#migrate-legacy-inbound-fields-to-rule-actions)
-and [Migrate legacy DNS route options to rule actions](/migration/#migrate-legacy-dns-route-options-to-rule-actions).
-
-**2**:
-
-Similar to Surge's pre-matching.
-
-Specifically, new rule actions allow you to reject connections with
-TCP RST (for TCP connections) and ICMP port unreachable (for UDP packets)
-before connection established to improve tun's compatibility.
-
-See [Rule Action](/configuration/route/rule_action/).
-
-#### 1.11.0-alpha.6
-
-* Update quic-go to v0.48.1
-* Set gateway for tun correctly
-* Fixes and improvements
-
-#### 1.11.0-alpha.2
-
-* Add warnings for usage of deprecated features
-* Fixes and improvements
-
-#### 1.11.0-alpha.1
-
-* Update quic-go to v0.48.0
-* Fixes and improvements
-
-### 1.10.1
-
-* Fixes and improvements
-
-### 1.10.0
-
-Important changes since 1.9:
-
-* Introducing auto-redirect **1**
-* Add AdGuard DNS Filter support **2**
-* TUN address fields are merged **3**
-* Add custom options for `auto-route` and `auto-redirect` **4**
-* Drop support for go1.18 and go1.19 **5**
-* Add tailing comma support in JSON configuration
-* Improve sniffers **6**
-* Add new `inline` rule-set type **7**
-* Add access control options for Clash API **8**
-* Add `rule_set_ip_cidr_accept_empty` DNS address filter rule item **9**
-* Add auto reload support for local rule-set
-* Update fsnotify usages **10**
-* Add IP address support for `rule-set match` command
-* Add `rule-set decompile` command
-* Add `process_path_regex` rule item
-* Update uTLS to v1.6.7 **11**
-* Optimize memory usages of rule-sets **12**
-
-**1**:
-
-The new auto-redirect feature allows TUN to automatically
-configure connection redirection to improve proxy performance.
-
-When auto-redirect is enabled, new route address set options will allow you to
-automatically configure destination IP CIDR rules from a specified rule set to the firewall.
-
-Specified or unspecified destinations will bypass the sing-box routes to get better performance
-(for example, keep hardware offloading of direct traffics on the router).
-
-See [TUN](/configuration/inbound/tun).
-
-**2**:
-
-The new feature allows you to use AdGuard DNS Filter lists in a sing-box without AdGuard Home.
-
-See [AdGuard DNS Filter](/configuration/rule-set/adguard/).
-
-**3**:
-
-See [Migration](/migration/#tun-address-fields-are-merged).
-
-**4**:
-
-See [iproute2_table_index](/configuration/inbound/tun/#iproute2_table_index),
-[iproute2_rule_index](/configuration/inbound/tun/#iproute2_rule_index),
-[auto_redirect_input_mark](/configuration/inbound/tun/#auto_redirect_input_mark) and
-[auto_redirect_output_mark](/configuration/inbound/tun/#auto_redirect_output_mark).
-
-**5**:
-
-Due to maintenance difficulties, sing-box 1.10.0 requires at least Go 1.20 to compile.
-
-**6**:
-
-BitTorrent, DTLS, RDP, SSH sniffers are added.
-
-Now the QUIC sniffer can correctly extract the server name from Chromium requests and
-can identify common QUIC clients, including
-Chromium, Safari, Firefox, quic-go (including uquic disguised as Chrome).
-
-**7**:
-
-The new [rule-set](/configuration/rule-set/) type inline (which also becomes the default type)
-allows you to write headless rules directly without creating a rule-set file.
-
-**8**:
-
-With new access control options, not only can you allow Clash dashboards
-to access the Clash API on your local network,
-you can also manually limit the websites that can access the API instead of allowing everyone.
-
-See [Clash API](/configuration/experimental/clash-api/).
-
-**9**:
-
-See [DNS Rule](/configuration/dns/rule/#rule_set_ip_cidr_accept_empty).
-
-**10**:
-
-sing-box now uses fsnotify correctly and will not cancel watching
-if the target file is deleted or recreated via rename (e.g. `mv`).
-
-This affects all path options that support reload, including
-`tls.certificate_path`, `tls.key_path`, `tls.ech.key_path` and `rule_set.path`.
-
-**11**:
-
-Some legacy chrome fingerprints have been removed and will fallback to chrome,
-see [utls](/configuration/shared/tls#utls).
-
-**12**:
-
-See [Source Format](/configuration/rule-set/source-format/#version).
-
-### 1.9.7
-
-* Fixes and improvements
-
-#### 1.10.0-beta.11
-
-* Update uTLS to v1.6.7 **1**
-
-**1**:
-
-Some legacy chrome fingerprints have been removed and will fallback to chrome,
-see [utls](/configuration/shared/tls#utls).
-
-#### 1.10.0-beta.10
-
-* Add `process_path_regex` rule item
-* Fixes and improvements
-
-_The macOS standalone versions of sing-box (>=1.9.5/<1.10.0-beta.11) now silently fail and require manual granting of
-the **Full Disk Access** permission to system extension to start, probably due to Apple's changed security policy. We
-will prompt users about this in feature versions._
-
-### 1.9.6
-
-* Fixes and improvements
-
-### 1.9.5
-
-* Update quic-go to v0.47.0
-* Fix direct dialer not resolving domain
-* Fix no error return when empty DNS cache retrieved
-* Fix build with go1.23
-* Fix stream sniffer
-* Fix bad redirect in clash-api
-* Fix wireguard events chan leak
-* Fix cached conn eats up read deadlines
-* Fix disconnected interface selected as default in windows
-* Update Bundle Identifiers for Apple platform clients **1**
-
-**1**:
-
-See [Migration](/migration/#bundle-identifier-updates-in-apple-platform-clients).
-
-We are still working on getting all sing-box apps back on the App Store, which should be completed within a week
-(SFI on the App Store and others on TestFlight are already available).
-
-#### 1.10.0-beta.8
-
-* Fixes and improvements
-
-_With the help of a netizen, we are in the process of getting sing-box apps back on the App Store, which should be
-completed within a month (TestFlight is already available)._
-
-#### 1.10.0-beta.7
-
-* Update quic-go to v0.47.0
-* Fixes and improvements
-
-#### 1.10.0-beta.6
-
-* Add RDP sniffer
-* Fixes and improvements
-
-#### 1.10.0-beta.5
-
-* Add PNA support for [Clash API](/configuration/experimental/clash-api/)
-* Fixes and improvements
-
-#### 1.10.0-beta.3
-
-* Add SSH sniffer
-* Fixes and improvements
-
-#### 1.10.0-beta.2
-
-* Build with go1.23
-* Fixes and improvements
-
-### 1.9.4
-
-* Update quic-go to v0.46.0
-* Update Hysteria2 BBR congestion control
-* Filter HTTPS ipv4hint/ipv6hint with domain strategy
-* Fix crash on Android when using process rules
-* Fix non-IP queries accepted by address filter rules
-* Fix UDP server for shadowsocks AEAD multi-user inbounds
-* Fix default next protos for v2ray QUIC transport
-* Fix default end value of port range configuration options
-* Fix reset v2ray transports
-* Fix panic caused by rule-set generation of duplicate keys for `domain_suffix`
-* Fix UDP connnection leak when sniffing
-* Fixes and improvements
-
-_Due to problems with our Apple developer account,
-sing-box apps on Apple platforms are temporarily unavailable for download or update.
-If your company or organization is willing to help us return to the App Store,
-please [contact us](mailto:contact@sagernet.org)._
-
-#### 1.10.0-alpha.29
-
-* Update quic-go to v0.46.0
-* Fixes and improvements
-
-#### 1.10.0-alpha.25
-
-* Add AdGuard DNS Filter support **1**
-
-**1**:
-
-The new feature allows you to use AdGuard DNS Filter lists in a sing-box without AdGuard Home.
-
-See [AdGuard DNS Filter](/configuration/rule-set/adguard/).
-
-#### 1.10.0-alpha.23
-
-* Add Chromium support for QUIC sniffer
-* Add client type detect support for QUIC sniffer **1**
-* Fixes and improvements
-
-**1**:
-
-Now the QUIC sniffer can correctly extract the server name from Chromium requests and
-can identify common QUIC clients, including
-Chromium, Safari, Firefox, quic-go (including uquic disguised as Chrome).
-
-See [Protocol Sniff](/configuration/route/sniff/) and [Route Rule](/configuration/route/rule/#client).
-
-#### 1.10.0-alpha.22
-
-* Optimize memory usages of rule-sets **1**
-* Fixes and improvements
-
-**1**:
-
-See [Source Format](/configuration/rule-set/source-format/#version).
-
-#### 1.10.0-alpha.20
-
-* Add DTLS sniffer
-* Fixes and improvements
-
-#### 1.10.0-alpha.19
-
-* Add `rule-set decompile` command
-* Add IP address support for `rule-set match` command
-* Fixes and improvements
-
-#### 1.10.0-alpha.18
-
-* Add new `inline` rule-set type **1**
-* Add auto reload support for local rule-set
-* Update fsnotify usages **2**
-* Fixes and improvements
-
-**1**:
-
-The new [rule-set](/configuration/rule-set/) type inline (which also becomes the default type)
-allows you to write headless rules directly without creating a rule-set file.
-
-**2**:
-
-sing-box now uses fsnotify correctly and will not cancel watching
-if the target file is deleted or recreated via rename (e.g. `mv`).
-
-This affects all path options that support reload, including
-`tls.certificate_path`, `tls.key_path`, `tls.ech.key_path` and `rule_set.path`.
-
-#### 1.10.0-alpha.17
-
-* Some chaotic changes **1**
-* `rule_set_ipcidr_match_source` rule items are renamed **2**
-* Add `rule_set_ip_cidr_accept_empty` DNS address filter rule item **3**
-* Update quic-go to v0.45.1
-* Fixes and improvements
-
-**1**:
-
-Something may be broken, please actively report problems with this version.
-
-**2**:
-
-`rule_set_ipcidr_match_source` route and DNS rule items are renamed to
-`rule_set_ip_cidr_match_source` and will be remove in sing-box 1.11.0.
-
-**3**:
-
-See [DNS Rule](/configuration/dns/rule/#rule_set_ip_cidr_accept_empty).
-
-#### 1.10.0-alpha.16
-
-* Add custom options for `auto-route` and `auto-redirect` **1**
-* Fixes and improvements
-
-**1**:
-
-See [iproute2_table_index](/configuration/inbound/tun/#iproute2_table_index),
-[iproute2_rule_index](/configuration/inbound/tun/#iproute2_rule_index),
-[auto_redirect_input_mark](/configuration/inbound/tun/#auto_redirect_input_mark) and
-[auto_redirect_output_mark](/configuration/inbound/tun/#auto_redirect_output_mark).
-
-#### 1.10.0-alpha.13
-
-* TUN address fields are merged **1**
-* Add route address set support for auto-redirect **2**
-
-**1**:
-
-See [Migration](/migration/#tun-address-fields-are-merged).
-
-**2**:
-
-The new feature will allow you to configure the destination IP CIDR rules
-in the specified rule-sets to the firewall automatically.
-
-Specified or unspecified destinations will bypass the sing-box routes to get better performance
-(for example, keep hardware offloading of direct traffics on the router).
-
-See [route_address_set](/configuration/inbound/tun/#route_address_set)
-and [route_exclude_address_set](/configuration/inbound/tun/#route_exclude_address_set).
-
-#### 1.10.0-alpha.12
-
-* Fix auto-redirect not configuring nftables forward chain correctly
-* Fixes and improvements
-
-### 1.9.3
-
-* Fixes and improvements
-
-#### 1.10.0-alpha.10
-
-* Fixes and improvements
-
-### 1.9.2
-
-* Fixes and improvements
-
-#### 1.10.0-alpha.8
-
-* Drop support for go1.18 and go1.19 **1**
-* Update quic-go to v0.45.0
-* Update Hysteria2 BBR congestion control
-* Fixes and improvements
-
-**1**:
-
-Due to maintenance difficulties, sing-box 1.10.0 requires at least Go 1.20 to compile.
-
-### 1.9.1
-
-* Fixes and improvements
-
-#### 1.10.0-alpha.7
-
-* Fixes and improvements
-
-#### 1.10.0-alpha.5
-
-* Improve auto-redirect **1**
-
-**1**:
-
-nftables support and DNS hijacking has been added.
-
-Tun inbounds with `auto_route` and `auto_redirect` now works as expected on routers **without intervention**.
-
-#### 1.10.0-alpha.4
-
-* Fix auto-redirect **1**
-* Improve auto-route on linux **2**
-
-**1**:
-
-Tun inbounds with `auto_route` and `auto_redirect` now works as expected on routers.
-
-**2**:
-
-Tun inbounds with `auto_route` and `strict_route` now works as expected on routers and servers,
-but the usages of [exclude_interface](/configuration/inbound/tun/#exclude_interface) need to be updated.
-
-#### 1.10.0-alpha.2
-
-* Move auto-redirect to Tun **1**
-* Fixes and improvements
-
-**1**:
-
-Linux support are added.
-
-See [Tun](/configuration/inbound/tun/#auto_redirect).
-
-#### 1.10.0-alpha.1
-
-* Add tailing comma support in JSON configuration
-* Add simple auto-redirect for Android **1**
-* Add BitTorrent sniffer **2**
-
-**1**:
-
-It allows you to use redirect inbound in the sing-box Android client
-and automatically configures IPv4 TCP redirection via su.
-
-This may alleviate the symptoms of some OCD patients who think that
-redirect can effectively save power compared to the system HTTP Proxy.
-
-See [Redirect](/configuration/inbound/redirect/).
-
-**2**:
-
-See [Protocol Sniff](/configuration/route/sniff/).
-
-### 1.9.0
-
-* Fixes and improvements
-
-Important changes since 1.8:
-
-* `domain_suffix` behavior update **1**
-* `process_path` format update on Windows **2**
-* Add address filter DNS rule items **3**
-* Add support for `client-subnet` DNS options **4**
-* Add rejected DNS response cache support **5**
-* Add `bypass_domain` and `search_domain` platform HTTP proxy options **6**
-* Fix missing `rule_set_ipcidr_match_source` item in DNS rules **7**
-* Handle Windows power events
-* Always disable cache for fake-ip DNS transport if `dns.independent_cache` disabled
-* Improve DNS truncate behavior
-* Update Hysteria protocol
-* Update quic-go to v0.43.1
-* Update gVisor to 20240422.0
-* Mitigating TunnelVision attacks **8**
-
-**1**:
-
-See [Migration](/migration/#domain_suffix-behavior-update).
-
-**2**:
-
-See [Migration](/migration/#process_path-format-update-on-windows).
-
-**3**:
-
-The new DNS feature allows you to more precisely bypass Chinese websites via **DNS leaks**. Do not use plain local DNS
-if using this method.
-
-See [Address Filter Fields](/configuration/dns/rule#address-filter-fields).
-
-[Client example](/manual/proxy/client#traffic-bypass-usage-for-chinese-users) updated.
-
-**4**:
-
-See [DNS](/configuration/dns), [DNS Server](/configuration/dns/server) and [DNS Rules](/configuration/dns/rule).
-
-Since this feature makes the scenario mentioned in `alpha.1` no longer leak DNS requests,
-the [Client example](/manual/proxy/client#traffic-bypass-usage-for-chinese-users) has been updated.
-
-**5**:
-
-The new feature allows you to cache the check results of
-[Address filter DNS rule items](/configuration/dns/rule/#address-filter-fields) until expiration.
-
-**6**:
-
-See [TUN](/configuration/inbound/tun) inbound.
-
-**7**:
-
-See [DNS Rule](/configuration/dns/rule/).
-
-**8**:
-
-See [TunnelVision](/manual/misc/tunnelvision).
-
-#### 1.9.0-rc.22
-
-* Fixes and improvements
-
-#### 1.9.0-rc.20
-
-* Prioritize `*_route_address` in linux auto-route
-* Fix `*_route_address` in darwin auto-route
-
-#### 1.8.14
-
-* Fix hysteria2 panic
-* Fixes and improvements
-
-#### 1.9.0-rc.18
-
-* Add custom prefix support in EDNS0 client subnet options
-* Fix hysteria2 crash
-* Fix `store_rdrc` corrupted
-* Update quic-go to v0.43.1
-* Fixes and improvements
-
-#### 1.9.0-rc.16
-
-* Mitigating TunnelVision attacks **1**
-* Fixes and improvements
-
-**1**:
-
-See [TunnelVision](/manual/misc/tunnelvision).
-
-#### 1.9.0-rc.15
-
-* Fixes and improvements
-
-#### 1.8.13
-
-* Fix fake-ip mapping
-* Fixes and improvements
-
-#### 1.9.0-rc.14
-
-* Fixes and improvements
-
-#### 1.9.0-rc.13
-
-* Update Hysteria protocol
-* Update quic-go to v0.43.0
-* Update gVisor to 20240422.0
-* Fixes and improvements
-
-#### 1.8.12
-
-* Now we have official APT and DNF repositories **1**
-* Fix packet MTU for QUIC protocols
-* Fixes and improvements
-
-**1**:
-
-Including stable and beta versions, see https://sing-box.sagernet.org/installation/package-manager/
-
-#### 1.9.0-rc.11
-
-* Fixes and improvements
-
-#### 1.8.11
-
-* Fixes and improvements
-
-#### 1.8.10
-
-* Fixes and improvements
-
-#### 1.9.0-beta.17
-
-* Update `quic-go` to v0.42.0
-* Fixes and improvements
-
-#### 1.9.0-beta.16
-
-* Fixes and improvements
-
-_Our Testflight distribution has been temporarily blocked by Apple (possibly due to too many beta versions)
-and you cannot join the test, install or update the sing-box beta app right now.
-Please wait patiently for processing._
-
-#### 1.9.0-beta.14
-
-* Update gVisor to 20240212.0-65-g71212d503
-* Fixes and improvements
-
-#### 1.8.9
-
-* Fixes and improvements
-
-#### 1.8.8
-
-* Fixes and improvements
-
-#### 1.9.0-beta.7
-
-* Fixes and improvements
-
-#### 1.9.0-beta.6
-
-* Fix address filter DNS rule items **1**
-* Fix DNS outbound responding with wrong data
-* Fixes and improvements
-
-**1**:
-
-Fixed an issue where address filter DNS rule was incorrectly rejected under certain circumstances.
-If you have enabled `store_rdrc` to save results, consider clearing the cache file.
-
-#### 1.8.7
-
-* Fixes and improvements
-
-#### 1.9.0-alpha.15
-
-* Fixes and improvements
-
-#### 1.9.0-alpha.14
-
-* Improve DNS truncate behavior
-* Fixes and improvements
-
-#### 1.9.0-alpha.13
-
-* Fixes and improvements
-
-#### 1.8.6
-
-* Fixes and improvements
-
-#### 1.9.0-alpha.12
-
-* Handle Windows power events
-* Always disable cache for fake-ip DNS transport if `dns.independent_cache` disabled
-* Fixes and improvements
-
-#### 1.9.0-alpha.11
-
-* Fix missing `rule_set_ipcidr_match_source` item in DNS rules **1**
-* Fixes and improvements
-
-**1**:
-
-See [DNS Rule](/configuration/dns/rule/).
-
-#### 1.9.0-alpha.10
-
-* Add `bypass_domain` and `search_domain` platform HTTP proxy options **1**
-* Fixes and improvements
-
-**1**:
-
-See [TUN](/configuration/inbound/tun) inbound.
-
-#### 1.9.0-alpha.8
-
-* Add rejected DNS response cache support **1**
-* Fixes and improvements
-
-**1**:
-
-The new feature allows you to cache the check results of
-[Address filter DNS rule items](/configuration/dns/rule/#address-filter-fields) until expiration.
-
-#### 1.9.0-alpha.7
-
-* Update gVisor to 20240206.0
-* Fixes and improvements
-
-#### 1.9.0-alpha.6
-
-* Fixes and improvements
-
-#### 1.9.0-alpha.3
-
-* Update `quic-go` to v0.41.0
-* Fixes and improvements
-
-#### 1.9.0-alpha.2
-
-* Add support for `client-subnet` DNS options **1**
-* Fixes and improvements
-
-**1**:
-
-See [DNS](/configuration/dns), [DNS Server](/configuration/dns/server) and [DNS Rules](/configuration/dns/rule).
-
-Since this feature makes the scenario mentioned in `alpha.1` no longer leak DNS requests,
-the [Client example](/manual/proxy/client#traffic-bypass-usage-for-chinese-users) has been updated.
-
-#### 1.9.0-alpha.1
-
-* `domain_suffix` behavior update **1**
-* `process_path` format update on Windows **2**
-* Add address filter DNS rule items **3**
-
-**1**:
-
-See [Migration](/migration/#domain_suffix-behavior-update).
-
-**2**:
-
-See [Migration](/migration/#process_path-format-update-on-windows).
-
-**3**:
-
-The new DNS feature allows you to more precisely bypass Chinese websites via **DNS leaks**. Do not use plain local DNS
-if using this method.
-
-See [Address Filter Fields](/configuration/dns/rule#address-filter-fields).
-
-[Client example](/manual/proxy/client#traffic-bypass-usage-for-chinese-users) updated.
-
-#### 1.8.5
-
-* Fixes and improvements
-
-#### 1.8.4
-
-* Fixes and improvements
-
-#### 1.8.2
-
-* Fixes and improvements
-
-#### 1.8.1
-
-* Fixes and improvements
-
-### 1.8.0
-
-* Fixes and improvements
-
-Important changes since 1.7:
-
-* Migrate cache file from Clash API to independent options **1**
-* Introducing [rule-set](/configuration/rule-set/) **2**
-* Add `sing-box geoip`, `sing-box geosite` and `sing-box rule-set` commands **3**
-* Allow nested logical rules **4**
-* Independent `source_ip_is_private` and `ip_is_private` rules **5**
-* Add context to JSON decode error message **6**
-* Reject internal fake-ip queries **7**
-* Add GSO support for TUN and WireGuard system interface **8**
-* Add `idle_timeout` for URLTest outbound **9**
-* Add simple loopback detect
-* Optimize memory usage of idle connections
-* Update uTLS to 1.5.4 **10**
-* Update dependencies **11**
-
-**1**:
-
-See [Cache File](/configuration/experimental/cache-file/) and
-[Migration](/migration/#migrate-cache-file-from-clash-api-to-independent-options).
-
-**2**:
-
-rule-set is independent collections of rules that can be compiled into binaries to improve performance.
-Compared to legacy GeoIP and Geosite resources,
-it can include more types of rules, load faster,
-use less memory, and update automatically.
-
-See [Route#rule_set](/configuration/route/#rule_set),
-[Route Rule](/configuration/route/rule/),
-[DNS Rule](/configuration/dns/rule/),
-[rule-set](/configuration/rule-set/),
-[Source Format](/configuration/rule-set/source-format/) and
-[Headless Rule](/configuration/rule-set/headless-rule/).
-
-For GEO resources migration, see [Migrate GeoIP to rule-sets](/migration/#migrate-geoip-to-rule-sets) and
-[Migrate Geosite to rule-sets](/migration/#migrate-geosite-to-rule-sets).
-
-**3**:
-
-New commands manage GeoIP, Geosite and rule-set resources, and help you migrate GEO resources to rule-sets.
-
-**4**:
-
-Logical rules in route rules, DNS rules, and the new headless rule now allow nesting of logical rules.
-
-**5**:
-
-The `private` GeoIP country never existed and was actually implemented inside V2Ray.
-Since GeoIP was deprecated, we made this rule independent, see [Migration](/migration/#migrate-geoip-to-rule-sets).
-
-**6**:
-
-JSON parse errors will now include the current key path.
-Only takes effect when compiled with Go 1.21+.
-
-**7**:
-
-All internal DNS queries now skip DNS rules with `server` type `fakeip`,
-and the default DNS server can no longer be `fakeip`.
-
-This change is intended to break incorrect usage and essentially requires no action.
-
-**8**:
-
-See [TUN](/configuration/inbound/tun/) inbound and [WireGuard](/configuration/outbound/wireguard/) outbound.
-
-**9**:
-
-When URLTest is idle for a certain period of time, the scheduled delay test will be paused.
-
-**10**:
-
-Added some new [fingerprints](/configuration/shared/tls#utls).
-Also, starting with this release, uTLS requires at least Go 1.20.
-
-**11**:
-
-Updated `cloudflare-tls`, `gomobile`, `smux`, `tfo-go` and `wireguard-go` to latest, `quic-go` to `0.40.1` and  `gvisor`
-to `20231204.0`
-
-#### 1.8.0-rc.11
-
-* Fixes and improvements
-
-#### 1.7.8
-
-* Fixes and improvements
-
-#### 1.8.0-rc.10
-
-* Fixes and improvements
-
-#### 1.7.7
-
-* Fix V2Ray transport `path` validation behavior **1**
-* Fixes and improvements
-
-**1**:
-
-See [V2Ray transport](/configuration/shared/v2ray-transport/).
-
-#### 1.8.0-rc.7
-
-* Fixes and improvements
-
-#### 1.8.0-rc.3
-
-* Fix V2Ray transport `path` validation behavior **1**
-* Fixes and improvements
-
-**1**:
-
-See [V2Ray transport](/configuration/shared/v2ray-transport/).
-
-#### 1.7.6
-
-* Fixes and improvements
-
-#### 1.8.0-rc.1
-
-* Fixes and improvements
-
-#### 1.8.0-beta.9
-
-* Add simple loopback detect
-* Fixes and improvements
-
-#### 1.7.5
-
-* Fixes and improvements
-
-#### 1.8.0-alpha.17
-
-* Add GSO support for TUN and WireGuard system interface **1**
-* Update uTLS to 1.5.4 **2**
-* Update dependencies **3**
-* Fixes and improvements
-
-**1**:
-
-See [TUN](/configuration/inbound/tun/) inbound and [WireGuard](/configuration/outbound/wireguard/) outbound.
-
-**2**:
-
-Added some new [fingerprints](/configuration/shared/tls#utls).
-Also, starting with this release, uTLS requires at least Go 1.20.
-
-**3**:
-
-Updated `cloudflare-tls`, `gomobile`, `smux`, `tfo-go` and `wireguard-go` to latest, and `gvisor` to `20231204.0`
-
-This may break something, good luck!
-
-#### 1.7.4
-
-* Fixes and improvements
-
-_Due to the long waiting time, this version is no longer waiting for approval
-by the Apple App Store, so updates to Apple Platforms will be delayed._
-
-#### 1.8.0-alpha.16
-
-* Fixes and improvements
-
-#### 1.8.0-alpha.15
-
-* Some chaotic changes **1**
-* Fixes and improvements
-
-**1**:
-
-Designed to optimize memory usage of idle connections, may take effect on the following protocols:
-
-| Protocol                                             | TCP              | UDP              |
-|------------------------------------------------------|------------------|------------------|
-| HTTP proxy server                                    | :material-check: | /                |
-| SOCKS5                                               | :material-close: | :material-check: |
-| Shadowsocks none/AEAD/AEAD2022                       | :material-check: | :material-check: |
-| Trojan                                               | /                | :material-check: |
-| TUIC/Hysteria/Hysteria2                              | :material-close: | :material-check: |
-| Multiplex                                            | :material-close: | :material-check: |
-| Plain TLS (Trojan/VLESS without extra sub-protocols) | :material-check: | /                |
-| Other protocols                                      | :material-close: | :material-close: |
-
-At the same time, everything existing may be broken, please actively report problems with this version.
-
-#### 1.8.0-alpha.13
-
-* Fixes and improvements
-
-#### 1.8.0-alpha.10
-
-* Add `idle_timeout` for URLTest outbound **1**
-* Fixes and improvements
-
-**1**:
-
-When URLTest is idle for a certain period of time, the scheduled delay test will be paused.
-
-#### 1.7.2
-
-* Fixes and improvements
-
-#### 1.8.0-alpha.8
-
-* Add context to JSON decode error message **1**
-* Reject internal fake-ip queries **2**
-* Fixes and improvements
-
-**1**:
-
-JSON parse errors will now include the current key path.
-Only takes effect when compiled with Go 1.21+.
-
-**2**:
-
-All internal DNS queries now skip DNS rules with `server` type `fakeip`,
-and the default DNS server can no longer be `fakeip`.
-
-This change is intended to break incorrect usage and essentially requires no action.
-
-#### 1.8.0-alpha.7
-
-* Fixes and improvements
-
-#### 1.7.1
-
-* Fixes and improvements
-
-#### 1.8.0-alpha.6
-
-* Fix rule-set matching logic **1**
-* Fixes and improvements
-
-**1**:
-
-Now the rules in the `rule_set` rule item can be logically considered to be merged into the rule using rule-sets,
-rather than completely following the AND logic.
-
-#### 1.8.0-alpha.5
-
-* Parallel rule-set initialization
-* Independent `source_ip_is_private` and `ip_is_private` rules **1**
-
-**1**:
-
-The `private` GeoIP country never existed and was actually implemented inside V2Ray.
-Since GeoIP was deprecated, we made this rule independent, see [Migration](/migration/#migrate-geoip-to-rule-sets).
-
-#### 1.8.0-alpha.1
-
-* Migrate cache file from Clash API to independent options **1**
-* Introducing [rule-set](/configuration/rule-set/) **2**
-* Add `sing-box geoip`, `sing-box geosite` and `sing-box rule-set` commands **3**
-* Allow nested logical rules **4**
-
-**1**:
-
-See [Cache File](/configuration/experimental/cache-file/) and
-[Migration](/migration/#migrate-cache-file-from-clash-api-to-independent-options).
-
-**2**:
-
-rule-set is independent collections of rules that can be compiled into binaries to improve performance.
-Compared to legacy GeoIP and Geosite resources,
-it can include more types of rules, load faster,
-use less memory, and update automatically.
-
-See [Route#rule_set](/configuration/route/#rule_set),
-[Route Rule](/configuration/route/rule/),
-[DNS Rule](/configuration/dns/rule/),
-[rule-set](/configuration/rule-set/),
-[Source Format](/configuration/rule-set/source-format/) and
-[Headless Rule](/configuration/rule-set/headless-rule/).
-
-For GEO resources migration, see [Migrate GeoIP to rule-sets](/migration/#migrate-geoip-to-rule-sets) and
-[Migrate Geosite to rule-sets](/migration/#migrate-geosite-to-rule-sets).
-
-**3**:
-
-New commands manage GeoIP, Geosite and rule-set resources, and help you migrate GEO resources to rule-sets.
-
-**4**:
-
-Logical rules in route rules, DNS rules, and the new headless rule now allow nesting of logical rules.
-
-### 1.7.0
-
-* Fixes and improvements
-
-Important changes since 1.6:
-
-* Add [exclude route support](/configuration/inbound/tun/) for TUN inbound
-* Add `udp_disable_domain_unmapping` [inbound listen option](/configuration/shared/listen/) **1**
-* Add [HTTPUpgrade V2Ray transport](/configuration/shared/v2ray-transport#HTTPUpgrade) support **2**
-* Migrate multiplex and UoT server to inbound **3**
-* Add TCP Brutal support for multiplex **4**
-* Add `wifi_ssid` and `wifi_bssid` route and DNS rules **5**
-* Update quic-go to v0.40.0
-* Update gVisor to 20231113.0
-
-**1**:
-
-If enabled, for UDP proxy requests addressed to a domain,
-the original packet address will be sent in the response instead of the mapped domain.
-
-This option is used for compatibility with clients that
-do not support receiving UDP packets with domain addresses, such as Surge.
-
-**2**:
-
-Introduced in V2Ray 5.10.0.
-
-The new HTTPUpgrade transport has better performance than WebSocket and is better suited for CDN abuse.
-
-**3**:
-
-Starting in 1.7.0, multiplexing support is no longer enabled by default
-and needs to be turned on explicitly in inbound
-options.
-
-**4**
-
-Hysteria Brutal Congestion Control Algorithm in TCP. A kernel module needs to be installed on the Linux server,
-see [TCP Brutal](/configuration/shared/tcp-brutal/) for details.
-
-**5**:
-
-Only supported in graphical clients on Android and Apple platforms.
-
-#### 1.7.0-rc.3
-
-* Fixes and improvements
-
-#### 1.6.7
-
-* macOS: Add button for uninstall SystemExtension in the standalone graphical client
-* Fix missing UDP user context on TUIC/Hysteria2 inbounds
-* Fixes and improvements
-
-#### 1.7.0-rc.2
-
-* Fix missing UDP user context on TUIC/Hysteria2 inbounds
-* macOS: Add button for uninstall SystemExtension in the standalone graphical client
-
-#### 1.6.6
-
-* Fixes and improvements
-
-#### 1.7.0-rc.1
-
-* Fixes and improvements
-
-#### 1.7.0-beta.5
-
-* Update gVisor to 20231113.0
-* Fixes and improvements
-
-#### 1.7.0-beta.4
-
-* Add `wifi_ssid` and `wifi_bssid` route and DNS rules **1**
-* Fixes and improvements
-
-**1**:
-
-Only supported in graphical clients on Android and Apple platforms.
-
-#### 1.7.0-beta.3
-
-* Fix zero TTL was incorrectly reset
-* Fixes and improvements
-
-#### 1.6.5
-
-* Fix crash if TUIC inbound authentication failed
-* Fixes and improvements
-
-#### 1.7.0-beta.2
-
-* Fix crash if TUIC inbound authentication failed
-* Update quic-go to v0.40.0
-* Fixes and improvements
-
-#### 1.6.4
-
-* Fixes and improvements
-
-#### 1.7.0-beta.1
-
-* Fixes and improvements
-
-#### 1.6.3
-
-* iOS/Android: Fix profile auto update
-* Fixes and improvements
-
-#### 1.7.0-alpha.11
-
-* iOS/Android: Fix profile auto update
-* Fixes and improvements
-
-#### 1.7.0-alpha.10
-
-* Fix tcp-brutal not working with TLS
-* Fix Android client not closing in some cases
-* Fixes and improvements
-
-#### 1.6.2
-
-* Fixes and improvements
-
-#### 1.6.1
-
-* Our [Android client](/installation/clients/sfa/) is now available in the Google Play Store ▶️
-* Fixes and improvements
-
-#### 1.7.0-alpha.6
-
-* Fixes and improvements
-
-#### 1.7.0-alpha.4
-
-* Migrate multiplex and UoT server to inbound **1**
-* Add TCP Brutal support for multiplex **2**
-
-**1**:
-
-Starting in 1.7.0, multiplexing support is no longer enabled by default and needs to be turned on explicitly in inbound
-options.
-
-**2**
-
-Hysteria Brutal Congestion Control Algorithm in TCP. A kernel module needs to be installed on the Linux server,
-see [TCP Brutal](/configuration/shared/tcp-brutal/) for details.
-
-#### 1.7.0-alpha.3
-
-* Add [HTTPUpgrade V2Ray transport](/configuration/shared/v2ray-transport#HTTPUpgrade) support **1**
-* Fixes and improvements
-
-**1**:
-
-Introduced in V2Ray 5.10.0.
-
-The new HTTPUpgrade transport has better performance than WebSocket and is better suited for CDN abuse.
-
-### 1.6.0
-
-* Fixes and improvements
-
-Important changes since 1.5:
-
-* Our [Apple tvOS client](/installation/clients/sft/) is now available in the App Store 🍎
-* Update BBR congestion control for TUIC and Hysteria2 **1**
-* Update brutal congestion control for Hysteria2
-* Add `brutal_debug` option for Hysteria2
-* Update legacy Hysteria protocol **2**
-* Add TLS self sign key pair generate command
-* Remove [Deprecated Features](/deprecated/) by agreement
-
-**1**:
-
-None of the existing Golang BBR congestion control implementations have been reviewed or unit tested.
-This update is intended to address the multi-send defects of the old implementation and may introduce new issues.
-
-**2**
-
-Based on discussions with the original author, the brutal CC and QUIC protocol parameters of
-the old protocol (Hysteria 1) have been updated to be consistent with Hysteria 2
-
-#### 1.7.0-alpha.2
-
-* Fix bugs introduced in 1.7.0-alpha.1
-
-#### 1.7.0-alpha.1
-
-* Add [exclude route support](/configuration/inbound/tun/) for TUN inbound
-* Add `udp_disable_domain_unmapping` [inbound listen option](/configuration/shared/listen/) **1**
-* Fixes and improvements
-
-**1**:
-
-If enabled, for UDP proxy requests addressed to a domain,
-the original packet address will be sent in the response instead of the mapped domain.
-
-This option is used for compatibility with clients that
-do not support receiving UDP packets with domain addresses, such as Surge.
-
 #### 1.5.5
 
 * Fix IPv6 `auto_route` for Linux **1**
@@ -1432,73 +10,11 @@ When `auto_route` is enabled and `strict_route` is disabled, the device can now 
 
 **2**:
 
-Built using Go 1.20, the last version that will run on
-Windows 7, 8, Server 2008, Server 2012 and macOS 10.13 High
-Sierra, 10.14 Mojave.
-
-#### 1.6.0-rc.4
-
-* Fixes and improvements
-
-#### 1.6.0-rc.1
-
-* Add legacy builds for old Windows and macOS systems **1**
-* Fixes and improvements
-
-**1**:
-
-Built using Go 1.20, the last version that will run on
-Windows 7, 8, Server 2008, Server 2012 and macOS 10.13 High
-Sierra, 10.14 Mojave.
-
-#### 1.6.0-beta.4
-
-* Fix IPv6 `auto_route` for Linux **1**
-* Fixes and improvements
-
-**1**:
-
-When `auto_route` is enabled and `strict_route` is disabled, the device can now be reached from external IPv6 addresses.
+Built using Go 1.20, the last version that will run on Windows 7, 8, Server 2008, Server 2012 and macOS 10.13 High Sierra, 10.14 Mojave.
 
 #### 1.5.4
 
 * Fix Clash cache crash on arm32 devices
-* Fixes and improvements
-
-#### 1.6.0-beta.3
-
-* Update the legacy Hysteria protocol **1**
-* Fixes and improvements
-
-**1**
-
-Based on discussions with the original author, the brutal CC and QUIC protocol parameters of
-the old protocol (Hysteria 1) have been updated to be consistent with Hysteria 2
-
-#### 1.6.0-beta.2
-
-* Add TLS self sign key pair generate command
-* Update brutal congestion control for Hysteria2
-* Fix Clash cache crash on arm32 devices
-* Update golang.org/x/net to v0.17.0
-* Fixes and improvements
-
-#### 1.6.0-beta.3
-
-* Update the legacy Hysteria protocol **1**
-* Fixes and improvements
-
-**1**
-
-Based on discussions with the original author, the brutal CC and QUIC protocol parameters of
-the old protocol (Hysteria 1) have been updated to be consistent with Hysteria 2
-
-#### 1.6.0-beta.2
-
-* Add TLS self sign key pair generate command
-* Update brutal congestion control for Hysteria2
-* Fix Clash cache crash on arm32 devices
-* Update golang.org/x/net to v0.17.0
 * Fixes and improvements
 
 #### 1.5.3
@@ -1506,64 +22,22 @@ the old protocol (Hysteria 1) have been updated to be consistent with Hysteria 2
 * Fix compatibility with Android 14
 * Fixes and improvements
 
-#### 1.6.0-beta.1
-
-* Fixes and improvements
-
-#### 1.6.0-alpha.5
-
-* Fix compatibility with Android 14
-* Update BBR congestion control for TUIC and Hysteria2 **1**
-* Fixes and improvements
-
-**1**:
-
-None of the existing Golang BBR congestion control implementations have been reviewed or unit tested.
-This update is intended to fix a memory leak flaw in the new implementation introduced in 1.6.0-alpha.1 and may
-introduce new issues.
-
-#### 1.6.0-alpha.4
-
-* Add `brutal_debug` option for Hysteria2
-* Fixes and improvements
-
 #### 1.5.2
 
-* Our [Apple tvOS client](/installation/clients/sft/) is now available in the App Store 🍎
-* Fixes and improvements
-
-#### 1.6.0-alpha.3
-
-* Fixes and improvements
-
-#### 1.6.0-alpha.2
-
+* Our [Apple tvOS client](/installation/clients/sft) is now available in the App Store 🍎
 * Fixes and improvements
 
 #### 1.5.1
 
 * Fixes and improvements
 
-#### 1.6.0-alpha.1
-
-* Update BBR congestion control for TUIC and Hysteria2 **1**
-* Update quic-go to v0.39.0
-* Update gVisor to 20230814.0
-* Remove [Deprecated Features](/deprecated/) by agreement
-* Fixes and improvements
-
-**1**:
-
-None of the existing Golang BBR congestion control implementations have been reviewed or unit tested.
-This update is intended to address the multi-send defects of the old implementation and may introduce new issues.
-
-### 1.5.0
+#### 1.5.0
 
 * Fixes and improvements
 
 Important changes since 1.4:
 
-* Add TLS [ECH server](/configuration/shared/tls/) support
+* Add TLS [ECH server](/configuration/shared/tls) support
 * Improve TLS TCH client configuration
 * Add TLS ECH key pair generator **1**
 * Add TLS ECH support for QUIC based protocols **2**
@@ -1572,7 +46,7 @@ Important changes since 1.4:
 * Add `interrupt_exist_connections` option for `Selector` and `URLTest` outbounds **4**
 * Add DNS01 challenge support for ACME TLS certificate issuer **5**
 * Add `merge` command **6**
-* Mark [Deprecated Features](/deprecated/)
+* Mark [Deprecated Features](/deprecated)
 
 **1**:
 
@@ -1584,7 +58,7 @@ All inbounds and outbounds are supported, including `Naiveproxy`, `Hysteria[/2]`
 
 **3**:
 
-See [Hysteria2 inbound](/configuration/inbound/hysteria2/) and [Hysteria2 outbound](/configuration/outbound/hysteria2/)
+See [Hysteria2 inbound](/configuration/inbound/hysteria2) and [Hysteria2 outbound](/configuration/outbound/hysteria2)
 
 For protocol description, please refer to [https://v2.hysteria.network](https://v2.hysteria.network)
 
@@ -1597,7 +71,7 @@ Only inbound connections are affected by this setting, internal connections will
 **5**:
 
 Only `Alibaba Cloud DNS` and `Cloudflare` are supported, see [ACME Fields](/configuration/shared/tls#acme-fields)
-and [DNS01 Challenge Fields](/configuration/shared/dns01_challenge/).
+and [DNS01 Challenge Fields](/configuration/shared/dns01_challenge).
 
 **6**:
 
@@ -1679,7 +153,7 @@ Global Flags:
 
 Only `Alibaba Cloud DNS` and `Cloudflare` are supported,
 see [ACME Fields](/configuration/shared/tls#acme-fields)
-and [DNS01 Challenge Fields](/configuration/shared/dns01_challenge/).
+and [DNS01 Challenge Fields](/configuration/shared/dns01_challenge).
 
 #### 1.5.0-beta.10
 
@@ -1708,7 +182,7 @@ Only inbound connections are affected by this setting, internal connections will
 
 * Fix compatibility issues with official Hysteria2 server and client
 * Fixes and improvements
-* Mark [deprecated features](/deprecated/)
+* Mark [deprecated features](/deprecated)
 
 #### 1.5.0-beta.3
 
@@ -1727,13 +201,13 @@ Hysteria2 server and client when using `fastOpen=false` or UDP MTU >= 1200.
 
 **1**:
 
-See [Hysteria2 inbound](/configuration/inbound/hysteria2/) and [Hysteria2 outbound](/configuration/outbound/hysteria2/)
+See [Hysteria2 inbound](/configuration/inbound/hysteria2) and [Hysteria2 outbound](/configuration/outbound/hysteria2)
 
 For protocol description, please refer to [https://v2.hysteria.network](https://v2.hysteria.network)
 
 #### 1.5.0-beta.1
 
-* Add TLS [ECH server](/configuration/shared/tls/) support
+* Add TLS [ECH server](/configuration/shared/tls) support
 * Improve TLS TCH client configuration
 * Add TLS ECH key pair generator **1**
 * Add TLS ECH support for QUIC based protocols **2**
@@ -1751,7 +225,7 @@ All inbounds and outbounds are supported, including `Naiveproxy`, `Hysteria`, `T
 
 * Fixes and improvements
 
-### 1.4.0
+#### 1.4.0
 
 * Fix bugs and update dependencies
 
@@ -1766,12 +240,12 @@ Important changes since 1.3:
 
 *1*:
 
-See [TUIC inbound](/configuration/inbound/tuic/)
-and [TUIC outbound](/configuration/outbound/tuic/)
+See [TUIC inbound](/configuration/inbound/tuic)
+and [TUIC outbound](/configuration/outbound/tuic)
 
 **2**:
 
-This is the TUIC port of the [UDP over TCP protocol](/configuration/shared/udp-over-tcp/), designed to provide a QUIC
+This is the TUIC port of the [UDP over TCP protocol](/configuration/shared/udp-over-tcp), designed to provide a QUIC
 stream based UDP relay mode that TUIC does not provide. Since it is an add-on protocol, you will need to use sing-box or
 another program compatible with the protocol as a server.
 
@@ -1802,7 +276,7 @@ Requires sing-box to be compiled with Go 1.21.
 
 **1**:
 
-This is the TUIC port of the [UDP over TCP protocol](/configuration/shared/udp-over-tcp/), designed to provide a QUIC
+This is the TUIC port of the [UDP over TCP protocol](/configuration/shared/udp-over-tcp), designed to provide a QUIC
 stream based UDP relay mode that TUIC does not provide. Since it is an add-on protocol, you will need to use sing-box or
 another program compatible with the protocol as a server.
 
@@ -1840,8 +314,8 @@ Requires sing-box to be compiled with Go 1.21.
 
 *1*:
 
-See [TUIC inbound](/configuration/inbound/tuic/)
-and [TUIC outbound](/configuration/outbound/tuic/)
+See [TUIC inbound](/configuration/inbound/tuic)
+and [TUIC outbound](/configuration/outbound/tuic)
 
 #### 1.3.6
 
@@ -1850,7 +324,7 @@ and [TUIC outbound](/configuration/outbound/tuic/)
 #### 1.3.5
 
 * Fixes and improvements
-* Introducing our [Apple tvOS](/installation/clients/sft/) client applications **1**
+* Introducing our [Apple tvOS](/installation/clients/sft) client applications **1**
 * Add per app proxy and app installed/updated trigger support for Android client
 * Add profile sharing support for Android/iOS/macOS clients
 
@@ -1877,8 +351,7 @@ downloaded through TestFlight.
 
 #### 1.3.1-beta.3
 
-* Introducing our [new iOS](/installation/clients/sfi/) and [macOS](/installation/clients/sfm/) client applications **1
-  **
+* Introducing our [new iOS](/installation/clients/sfi) and [macOS](/installation/clients/sfm) client applications **1**
 * Fixes and improvements
 
 **1**:
@@ -1893,13 +366,13 @@ The old testflight link and app are no longer valid.
 
 * Fixes and improvements
 
-### 1.3.0
+#### 1.3.0
 
 * Fix bugs and update dependencies
 
 Important changes since 1.2:
 
-* Add [FakeIP](/configuration/dns/fakeip/) support **1**
+* Add [FakeIP](/configuration/dns/fakeip) support **1**
 * Improve multiplex **2**
 * Add [DNS reverse mapping](/configuration/dns#reverse_mapping) support
 * Add `rewrite_ttl` DNS rule action
@@ -1926,11 +399,11 @@ Important changes since 1.2:
 
 *1*:
 
-See [FAQ](/faq/fakeip/) for more information.
+See [FAQ](/faq/fakeip) for more information.
 
 *2*:
 
-Added new `h2mux` multiplex protocol and `padding` multiplex option, see [Multiplex](/configuration/shared/multiplex/).
+Added new `h2mux` multiplex protocol and `padding` multiplex option, see [Multiplex](/configuration/shared/multiplex).
 
 #### 1.3-rc2
 
@@ -1992,7 +465,7 @@ Improved performance and reduced memory usage.
 
 *1*:
 
-Added new `h2mux` multiplex protocol and `padding` multiplex option, see [Multiplex](/configuration/shared/multiplex/).
+Added new `h2mux` multiplex protocol and `padding` multiplex option, see [Multiplex](/configuration/shared/multiplex).
 
 #### 1.2.6
 
@@ -2044,25 +517,25 @@ This is an incompatible update for XUDP in VLESS if vision flow is enabled.
 #### 1.3-beta1
 
 * Add [DNS reverse mapping](/configuration/dns#reverse_mapping) support
-* Add [L3 routing](/configuration/route/ip-rule/) support **1**
+* Add [L3 routing](/configuration/route/ip-rule) support **1**
 * Add `rewrite_ttl` DNS rule action
-* Add [FakeIP](/configuration/dns/fakeip/) support **2**
+* Add [FakeIP](/configuration/dns/fakeip) support **2**
 * Add `store_fakeip` Clash API option
 * Add multi-peer support for [WireGuard](/configuration/outbound/wireguard#peers) outbound
 * Add loopback detect
 
 *1*:
 
-It can currently be used to [route connections directly to WireGuard](/examples/wireguard-direct/) or block connections
+It can currently be used to [route connections directly to WireGuard](/examples/wireguard-direct) or block connections
 at the IP layer.
 
 *2*:
 
-See [FAQ](/faq/fakeip/) for more information.
+See [FAQ](/faq/fakeip) for more information.
 
 #### 1.2.3
 
-* Introducing our [new Android client application](/installation/clients/sfa/)
+* Introducing our [new Android client application](/installation/clients/sfa)
 * Improve UDP domain destination NAT
 * Update reality protocol
 * Fix TTL calculation for DNS response
@@ -2085,22 +558,22 @@ to `domain` rule.
 * Flush DNS cache for macOS when tun start/close
 * Fix tun's DNS hijacking compatibility with systemd-resolved
 
-### 1.2.0
+#### 1.2.0
 
 * Fix bugs and update dependencies
 
 Important changes since 1.1:
 
-* Introducing our [new iOS client application](/installation/clients/sfi/)
-* Introducing [UDP over TCP protocol version 2](/configuration/shared/udp-over-tcp/)
+* Introducing our [new iOS client application](/installation/clients/sfi)
+* Introducing [UDP over TCP protocol version 2](/configuration/shared/udp-over-tcp)
 * Add [platform options](/configuration/inbound/tun#platform) for tun inbound
 * Add [ShadowTLS protocol v3](https://github.com/ihciah/shadow-tls/blob/master/docs/protocol-v3-en.md)
-* Add [VLESS server](/configuration/inbound/vless/) and [vision](/configuration/outbound/vless#flow) support
-* Add [reality TLS](/configuration/shared/tls/) support
-* Add [NTP service](/configuration/ntp/)
-* Add [DHCP DNS server](/configuration/dns/server/) support
-* Add SSH [host key validation](/configuration/outbound/ssh/) support
-* Add [query_type](/configuration/dns/rule/) DNS rule item
+* Add [VLESS server](/configuration/inbound/vless) and [vision](/configuration/outbound/vless#flow) support
+* Add [reality TLS](/configuration/shared/tls) support
+* Add [NTP service](/configuration/ntp)
+* Add [DHCP DNS server](/configuration/dns/server) support
+* Add SSH [host key validation](/configuration/outbound/ssh) support
+* Add [query_type](/configuration/dns/rule) DNS rule item
 * Add fallback support for v2ray transport
 * Add custom TLS server support for http based v2ray transports
 * Add health check support for http-based v2ray transports
@@ -2131,7 +604,7 @@ name.
 
 #### 1.2-beta9
 
-* Introducing the [UDP over TCP protocol version 2](/configuration/shared/udp-over-tcp/)
+* Introducing the [UDP over TCP protocol version 2](/configuration/shared/udp-over-tcp)
 * Add health check support for http-based v2ray transports
 * Remove length limit on short_id for reality TLS config
 * Fix bugs and update dependencies
@@ -2148,7 +621,7 @@ name.
 
 #### 1.2-beta6
 
-* Introducing our [new iOS client application](/installation/clients/sfi/)
+* Introducing our [new iOS client application](/installation/clients/sfi)
 * Add [platform options](/configuration/inbound/tun#platform) for tun inbound
 * Add custom TLS server support for http based v2ray transports
 * Add generate commands
@@ -2161,8 +634,8 @@ name.
 
 #### 1.2-beta5
 
-* Add [VLESS server](/configuration/inbound/vless/) and [vision](/configuration/outbound/vless#flow) support
-* Add [reality TLS](/configuration/shared/tls/) support
+* Add [VLESS server](/configuration/inbound/vless) and [vision](/configuration/outbound/vless#flow) support
+* Add [reality TLS](/configuration/shared/tls) support
 * Fix match private address
 
 #### 1.1.6
@@ -2177,7 +650,7 @@ name.
 
 #### 1.2-beta4
 
-* Add [NTP service](/configuration/ntp/)
+* Add [NTP service](/configuration/ntp)
 * Add Add multiple server names and multi-user support for shadowtls
 * Add strict mode support for shadowtls v3
 * Add uTLS support for shadowtls v3
@@ -2197,9 +670,9 @@ name.
 
 #### 1.2-beta1
 
-* Add [DHCP DNS server](/configuration/dns/server/) support
-* Add SSH [host key validation](/configuration/outbound/ssh/) support
-* Add [query_type](/configuration/dns/rule/) DNS rule item
+* Add [DHCP DNS server](/configuration/dns/server) support
+* Add SSH [host key validation](/configuration/outbound/ssh) support
+* Add [query_type](/configuration/dns/rule) DNS rule item
 * Add v2ray [user stats](/configuration/experimental#statsusers) api
 * Add new clash DNS query api
 * Improve vmess request
@@ -2428,7 +901,7 @@ and [ShadowTLS outbound](/configuration/outbound/shadowtls#version)
 
 #### 1.1-beta6
 
-* Add [URLTest outbound](/configuration/outbound/urltest/)
+* Add [URLTest outbound](/configuration/outbound/urltest)
 * Fix bugs in 1.1-beta5
 
 #### 1.1-beta5
@@ -2460,8 +933,8 @@ The default tun stack is changed to system.
 #### 1.1-beta4
 
 * Add internal simple-obfs and v2ray-plugin [Shadowsocks plugins](/configuration/outbound/shadowsocks#plugin)
-* Add [ShadowsocksR outbound](/configuration/outbound/shadowsocksr/)
-* Add [VLESS outbound and XUDP](/configuration/outbound/vless/)
+* Add [ShadowsocksR outbound](/configuration/outbound/shadowsocksr)
+* Add [VLESS outbound and XUDP](/configuration/outbound/vless)
 * Skip wait for hysteria tcp handshake response
 * Fix socks4 client
 * Fix hysteria inbound
@@ -2488,7 +961,7 @@ The default tun stack is changed to system.
 *1*:
 
 Switching modes using the Clash API, and `store-selected` are now supported,
-see [Experimental](/configuration/experimental/).
+see [Experimental](/configuration/experimental).
 
 *2*:
 
@@ -2569,15 +1042,15 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 * Fix write trojan udp
 * Fix DNS routing
 * Add attribute support for geosite
-* Update documentation for [Dial Fields](/configuration/shared/dial/)
+* Update documentation for [Dial Fields](/configuration/shared/dial)
 
 #### 1.0-beta3
 
 * Add [chained inbound](/configuration/shared/listen#detour) support
 * Add process_path rule item
 * Add macOS redirect support
-* Add ShadowTLS [Inbound](/configuration/inbound/shadowtls/), [Outbound](/configuration/outbound/shadowtls/)
-  and [Examples](/examples/shadowtls/)
+* Add ShadowTLS [Inbound](/configuration/inbound/shadowtls), [Outbound](/configuration/outbound/shadowtls)
+  and [Examples](/examples/shadowtls)
 * Fix search android package in non-owner users
 * Fix socksaddr type condition
 * Fix smux session status
@@ -2621,7 +1094,7 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 
 ##### 2022/08/23
 
-* Add [V2Ray Transport](/configuration/shared/v2ray-transport/) support for VMess and Trojan
+* Add [V2Ray Transport](/configuration/shared/v2ray-transport) support for VMess and Trojan
 * Allow plain http request in Naive inbound (It can now be used with nginx)
 * Add proxy protocol support
 * Free memory after start
@@ -2630,13 +1103,13 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 
 ##### 2022/08/22
 
-* Add strategy setting for each [DNS server](/configuration/dns/server/)
+* Add strategy setting for each [DNS server](/configuration/dns/server)
 * Add bind address to outbound options
 
 ##### 2022/08/21
 
-* Add [Tor outbound](/configuration/outbound/tor/)
-* Add [SSH outbound](/configuration/outbound/ssh/)
+* Add [Tor outbound](/configuration/outbound/tor)
+* Add [SSH outbound](/configuration/outbound/ssh)
 
 ##### 2022/08/20
 
@@ -2650,8 +1123,8 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 
 ##### 2022/08/19
 
-* Add Hysteria [Inbound](/configuration/inbound/hysteria/) and [Outbund](/configuration/outbound/hysteria/)
-* Add [ACME TLS certificate issuer](/configuration/shared/tls/)
+* Add Hysteria [Inbound](/configuration/inbound/hysteria) and [Outbund](/configuration/outbound/hysteria)
+* Add [ACME TLS certificate issuer](/configuration/shared/tls)
 * Allow read config from stdin (-c stdin)
 * Update gVisor to 20220815.0
 
@@ -2669,11 +1142,11 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 ##### 2022/08/16
 
 * Add ip_version (route/dns) rule item
-* Add [WireGuard](/configuration/outbound/wireguard/) outbound
+* Add [WireGuard](/configuration/outbound/wireguard) outbound
 
 ##### 2022/08/15
 
-* Add uid, android user and package rules support in [Tun](/configuration/inbound/tun/) routing.
+* Add uid, android user and package rules support in [Tun](/configuration/inbound/tun) routing.
 
 ##### 2022/08/13
 
@@ -2682,15 +1155,15 @@ and [Listen Fields](/configuration/shared/listen#udp_fragment).
 ##### 2022/08/12
 
 * Performance improvements
-* Add UoT option for [SOCKS](/configuration/outbound/socks/) outbound
+* Add UoT option for [SOCKS](/configuration/outbound/socks) outbound
 
 ##### 2022/08/11
 
-* Add UoT option for [Shadowsocks](/configuration/outbound/shadowsocks/) outbound, UoT support for all inbounds
+* Add UoT option for [Shadowsocks](/configuration/outbound/shadowsocks) outbound, UoT support for all inbounds
 
 ##### 2022/08/10
 
-* Add full-featured [Naive](/configuration/inbound/naive/) inbound
+* Add full-featured [Naive](/configuration/inbound/naive) inbound
 * Fix default dns server option [#9] by iKirby
 
 ##### 2022/08/09

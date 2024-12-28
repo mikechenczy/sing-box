@@ -10,10 +10,9 @@
     "proxy-b",
     "proxy-c"
   ],
-  "url": "",
-  "interval": "",
-  "tolerance": 0,
-  "idle_timeout": "",
+  "url": "https://www.gstatic.com/generate_204",
+  "interval": "1m",
+  "tolerance": 50,
   "interrupt_exist_connections": false
 }
 ```
@@ -32,15 +31,11 @@ The URL to test. `https://www.gstatic.com/generate_204` will be used if empty.
 
 #### interval
 
-The test interval. `3m` will be used if empty.
+The test interval. `1m` will be used if empty.
 
 #### tolerance
 
 The test tolerance in milliseconds. `50` will be used if empty.
-
-#### idle_timeout
-
-The idle timeout. `30m` will be used if empty.
 
 #### interrupt_exist_connections
 

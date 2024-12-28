@@ -85,10 +85,9 @@ func (c *ClientConn) Upstream() any {
 
 type ClientPacketConn struct {
 	net.Conn
-	access          sync.Mutex
-	key             [KeyLength]byte
-	headerWritten   bool
-	readWaitOptions N.ReadWaitOptions
+	access        sync.Mutex
+	key           [KeyLength]byte
+	headerWritten bool
 }
 
 func NewClientPacketConn(conn net.Conn, key [KeyLength]byte) *ClientPacketConn {

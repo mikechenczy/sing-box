@@ -29,9 +29,13 @@
 }
 ```
 
+!!! warning ""
+
+    QUIC, which is required by hysteria is not included by default, see [Installation](/#installation).
+
 ### Listen Fields
 
-See [Listen Fields](/configuration/shared/listen/) for details.
+See [Listen Fields](/configuration/shared/listen) for details.
 
 ### Fields
 

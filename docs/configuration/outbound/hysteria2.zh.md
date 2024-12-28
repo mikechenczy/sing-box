@@ -16,17 +16,14 @@
   "password": "goofy_ahh_password",
   "network": "tcp",
   "tls": {},
-  "brutal_debug": false,
   
   ... // 拨号字段
 }
 ```
 
-!!! warning "与官方 Hysteria2 的区别"
+!!! warning ""
 
-    官方程序支持一种名为 **userpass** 的验证方式，
-    本质上上是将用户名与密码的组合 `<username>:<password>` 作为实际上的密码，而 sing-box 不提供此别名。
-    要将 sing-box 与官方程序一起使用， 您需要填写该组合作为实际密码。
+    默认安装不包含被 Hysteria2 依赖的 QUIC，参阅 [安装](/zh/#_2)。
 
 ### 字段
 
@@ -46,7 +43,7 @@
 
 最大带宽。
 
-如果为空，将使用 BBR 拥塞控制算法而不是 Hysteria CC。
+如果为空，将使用 BBR 流量控制算法而不是 Hysteria CC。
 
 #### obfs.type
 
@@ -76,9 +73,6 @@ QUIC 流量混淆器密码.
 
 TLS 配置, 参阅 [TLS](/zh/configuration/shared/tls/#outbound)。
 
-#### brutal_debug
-
-启用 Hysteria Brutal CC 的调试信息日志记录。
 
 ### 拨号字段
 

@@ -1,11 +1,3 @@
----
-icon: material/alert-decagram
----
-
-!!! quote "Changes in sing-box 1.10.0"
-
-    :material-alert-decagram: [utls](#utls)  
-
 ### Inbound
 
 ```json
@@ -172,19 +164,16 @@ By default, the maximum version is currently TLS 1.3.
 
 #### cipher_suites
 
-A list of enabled TLS 1.0–1.2 cipher suites. The order of the list is ignored. Note that TLS 1.3 cipher suites are not configurable.
+The elliptic curves that will be used in an ECDHE handshake, in preference order.
 
-If empty, a safe default list is used. The default cipher suites might change over time.
+If empty, the default will be used. The client will use the first preference as the type for its key share in TLS 1.3.
+This may change in the future.
 
 #### certificate
 
 The server certificate line array, in PEM format.
 
 #### certificate_path
-
-!!! note ""
-
-    Will be automatically reloaded if file modified.
 
 The path to the server certificate, in PEM format.
 
@@ -198,10 +187,6 @@ The server private key line array, in PEM format.
 
 ==Server only==
 
-!!! note ""
-
-    Will be automatically reloaded if file modified.
-
 The path to the server private key, in PEM format.
 
 ## Custom TLS support
@@ -214,23 +199,17 @@ The path to the server private key, in PEM format.
 
 ==Client only==
 
-!!! failure ""
-    
-    There is no evidence that GFW detects and blocks servers based on TLS client fingerprinting, and using an imperfect emulation that has not been security reviewed could pose security risks.
+!!! warning ""
+
+    uTLS is not included by default, see [Installation](/#installation).
+
+!!! note ""
+
+    uTLS is poorly maintained and the effect may be unproven, use at your own risk.
 
 uTLS is a fork of "crypto/tls", which provides ClientHello fingerprinting resistance.
 
 Available fingerprint values:
-
-!!! warning "Removed since sing-box 1.10.0"
-
-    Some legacy chrome fingerprints have been removed and will fallback to chrome:
-
-    :material-close: chrome_psk  
-    :material-close: chrome_psk_shuffle  
-    :material-close: chrome_padding_psk_shuffle  
-    :material-close: chrome_pq  
-    :material-close: chrome_pq_psk
 
 * chrome
 * firefox
@@ -246,6 +225,10 @@ Available fingerprint values:
 Chrome fingerprint will be used if empty.
 
 ### ECH Fields
+
+!!! warning ""
+
+    ECH is not included by default, see [Installation](/#installation).
 
 ECH (Encrypted Client Hello) is a TLS extension that allows a client to encrypt the first part of its ClientHello
 message.
@@ -275,10 +258,6 @@ ECH key line array, in PEM format.
 
 ==Server only==
 
-!!! note ""
-
-    Will be automatically reloaded if file modified.
-
 The path to ECH key, in PEM format.
 
 #### config
@@ -298,6 +277,10 @@ The path to ECH configuration, in PEM format.
 If empty, load from DNS will be attempted.
 
 ### ACME Fields
+
+!!! warning ""
+
+    ACME is not included by default, see [Installation](/#installation).
 
 #### domain
 
@@ -370,9 +353,17 @@ The MAC key.
 
 ACME DNS01 challenge field. If configured, other challenge methods will be disabled.
 
-See [DNS01 Challenge Fields](/configuration/shared/dns01_challenge/) for details.
+See [DNS01 Challenge Fields](/configuration/shared/dns01_challenge) for details.
 
 ### Reality Fields
+
+!!! warning ""
+
+    reality server is not included by default, see [Installation](/#installation).
+
+!!! warning ""
+
+    uTLS, which is required by reality client is not included by default, see [Installation](/#installation).
 
 #### handshake
 
@@ -380,7 +371,7 @@ See [DNS01 Challenge Fields](/configuration/shared/dns01_challenge/) for details
 
 ==Required==
 
-Handshake server address and [Dial Fields](/configuration/shared/dial/).
+Handshake server address and [Dial options](/configuration/shared/dial).
 
 #### private_key
 
@@ -411,3 +402,7 @@ A hexadecimal string with zero to eight digits.
 The maximum time difference between the server and the client.
 
 Check disabled if empty.
+
+### Reload
+
+For server configuration, certificate, key and ECH key will be automatically reloaded if modified.

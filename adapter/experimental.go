@@ -1,97 +1,38 @@
 package adapter
 
 import (
-	"bytes"
 	"context"
-	"encoding/binary"
-	"time"
+	"net"
 
 	"github.com/sagernet/sing-box/common/urltest"
-	"github.com/sagernet/sing-dns"
-	"github.com/sagernet/sing/common/varbin"
+	N "github.com/sagernet/sing/common/network"
 )
 
 type ClashServer interface {
-	LifecycleService
-	ConnectionTracker
+	Service
+	PreStarter
 	Mode() string
 	ModeList() []string
-	HistoryStorage() *urltest.HistoryStorage
-}
-
-type V2RayServer interface {
-	LifecycleService
-	StatsService() ConnectionTracker
-}
-
-type CacheFile interface {
-	LifecycleService
-
+	StoreSelected() bool
 	StoreFakeIP() bool
-	FakeIPStorage
+	CacheFile() ClashCacheFile
+	HistoryStorage() *urltest.HistoryStorage
+	RoutedConnection(ctx context.Context, conn net.Conn, metadata InboundContext, matchedRule Rule) (net.Conn, Tracker)
+	RoutedPacketConnection(ctx context.Context, conn N.PacketConn, metadata InboundContext, matchedRule Rule) (N.PacketConn, Tracker)
+}
 
-	StoreRDRC() bool
-	dns.RDRCStore
-
+type ClashCacheFile interface {
 	LoadMode() string
 	StoreMode(mode string) error
 	LoadSelected(group string) string
 	StoreSelected(group string, selected string) error
 	LoadGroupExpand(group string) (isExpand bool, loaded bool)
 	StoreGroupExpand(group string, expand bool) error
-	LoadRuleSet(tag string) *SavedRuleSet
-	SaveRuleSet(tag string, set *SavedRuleSet) error
+	FakeIPStorage
 }
 
-type SavedRuleSet struct {
-	Content     []byte
-	LastUpdated time.Time
-	LastEtag    string
-}
-
-func (s *SavedRuleSet) MarshalBinary() ([]byte, error) {
-	var buffer bytes.Buffer
-	err := binary.Write(&buffer, binary.BigEndian, uint8(1))
-	if err != nil {
-		return nil, err
-	}
-	err = varbin.Write(&buffer, binary.BigEndian, s.Content)
-	if err != nil {
-		return nil, err
-	}
-	err = binary.Write(&buffer, binary.BigEndian, s.LastUpdated.Unix())
-	if err != nil {
-		return nil, err
-	}
-	err = varbin.Write(&buffer, binary.BigEndian, s.LastEtag)
-	if err != nil {
-		return nil, err
-	}
-	return buffer.Bytes(), nil
-}
-
-func (s *SavedRuleSet) UnmarshalBinary(data []byte) error {
-	reader := bytes.NewReader(data)
-	var version uint8
-	err := binary.Read(reader, binary.BigEndian, &version)
-	if err != nil {
-		return err
-	}
-	err = varbin.Read(reader, binary.BigEndian, &s.Content)
-	if err != nil {
-		return err
-	}
-	var lastUpdated int64
-	err = binary.Read(reader, binary.BigEndian, &lastUpdated)
-	if err != nil {
-		return err
-	}
-	s.LastUpdated = time.Unix(lastUpdated, 0)
-	err = varbin.Read(reader, binary.BigEndian, &s.LastEtag)
-	if err != nil {
-		return err
-	}
-	return nil
+type Tracker interface {
+	Leave()
 }
 
 type OutboundGroup interface {
@@ -102,7 +43,7 @@ type OutboundGroup interface {
 
 type URLTestGroup interface {
 	OutboundGroup
-	URLTest(ctx context.Context) (map[string]uint16, error)
+	URLTest(ctx context.Context, url string) (map[string]uint16, error)
 }
 
 func OutboundTag(detour Outbound) string {
@@ -110,4 +51,14 @@ func OutboundTag(detour Outbound) string {
 		return group.Now()
 	}
 	return detour.Tag()
+}
+
+type V2RayServer interface {
+	Service
+	StatsService() V2RayStatsService
+}
+
+type V2RayStatsService interface {
+	RoutedConnection(inbound string, outbound string, user string, conn net.Conn) net.Conn
+	RoutedPacketConnection(inbound string, outbound string, user string, conn N.PacketConn) N.PacketConn
 }

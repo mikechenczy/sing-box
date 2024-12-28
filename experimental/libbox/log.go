@@ -20,11 +20,13 @@ func RedirectStderr(path string) error {
 		return err
 	}
 	if runtime.GOOS != "android" {
-		err = outputFile.Chown(sUserID, sGroupID)
-		if err != nil {
-			outputFile.Close()
-			os.Remove(outputFile.Name())
-			return err
+		if sUserID > 0 {
+			err = outputFile.Chown(sUserID, sGroupID)
+			if err != nil {
+				outputFile.Close()
+				os.Remove(outputFile.Name())
+				return err
+			}
 		}
 	}
 	err = unix.Dup2(int(outputFile.Fd()), int(os.Stderr.Fd()))

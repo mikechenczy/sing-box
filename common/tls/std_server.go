@@ -7,13 +7,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/sagernet/fswatch"
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/log"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common"
 	E "github.com/sagernet/sing/common/exceptions"
 	"github.com/sagernet/sing/common/ntp"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 var errInsecureUnused = E.New("tls: insecure unused")
@@ -26,7 +27,7 @@ type STDServerConfig struct {
 	key             []byte
 	certificatePath string
 	keyPath         string
-	watcher         *fswatch.Watcher
+	watcher         *fsnotify.Watcher
 }
 
 func (c *STDServerConfig) ServerName() string {
@@ -38,19 +39,11 @@ func (c *STDServerConfig) SetServerName(serverName string) {
 }
 
 func (c *STDServerConfig) NextProtos() []string {
-	if c.acmeService != nil && len(c.config.NextProtos) > 1 && c.config.NextProtos[0] == ACMETLS1Protocol {
-		return c.config.NextProtos[1:]
-	} else {
-		return c.config.NextProtos
-	}
+	return c.config.NextProtos
 }
 
 func (c *STDServerConfig) SetNextProtos(nextProto []string) {
-	if c.acmeService != nil && len(c.config.NextProtos) > 1 && c.config.NextProtos[0] == ACMETLS1Protocol {
-		c.config.NextProtos = append(c.config.NextProtos[:1], nextProto...)
-	} else {
-		c.config.NextProtos = nextProto
-	}
+	c.config.NextProtos = nextProto
 }
 
 func (c *STDServerConfig) Config() (*STDConfig, error) {
@@ -87,41 +80,59 @@ func (c *STDServerConfig) Start() error {
 }
 
 func (c *STDServerConfig) startWatcher() error {
-	var watchPath []string
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return err
+	}
 	if c.certificatePath != "" {
-		watchPath = append(watchPath, c.certificatePath)
+		err = watcher.Add(c.certificatePath)
+		if err != nil {
+			return err
+		}
 	}
 	if c.keyPath != "" {
-		watchPath = append(watchPath, c.keyPath)
-	}
-	watcher, err := fswatch.NewWatcher(fswatch.Options{
-		Path: watchPath,
-		Callback: func(path string) {
-			err := c.certificateUpdated(path)
-			if err != nil {
-				c.logger.Error(err)
-			}
-		},
-	})
-	if err != nil {
-		return err
-	}
-	err = watcher.Start()
-	if err != nil {
-		return err
+		err = watcher.Add(c.keyPath)
+		if err != nil {
+			return err
+		}
 	}
 	c.watcher = watcher
+	go c.loopUpdate()
 	return nil
 }
 
-func (c *STDServerConfig) certificateUpdated(path string) error {
-	if path == c.certificatePath {
+func (c *STDServerConfig) loopUpdate() {
+	for {
+		select {
+		case event, ok := <-c.watcher.Events:
+			if !ok {
+				return
+			}
+			if event.Op&fsnotify.Write != fsnotify.Write {
+				continue
+			}
+			err := c.reloadKeyPair()
+			if err != nil {
+				c.logger.Error(E.Cause(err, "reload TLS key pair"))
+			}
+		case err, ok := <-c.watcher.Errors:
+			if !ok {
+				return
+			}
+			c.logger.Error(E.Cause(err, "fsnotify error"))
+		}
+	}
+}
+
+func (c *STDServerConfig) reloadKeyPair() error {
+	if c.certificatePath != "" {
 		certificate, err := os.ReadFile(c.certificatePath)
 		if err != nil {
 			return E.Cause(err, "reload certificate from ", c.certificatePath)
 		}
 		c.certificate = certificate
-	} else if path == c.keyPath {
+	}
+	if c.keyPath != "" {
 		key, err := os.ReadFile(c.keyPath)
 		if err != nil {
 			return E.Cause(err, "reload key from ", c.keyPath)
@@ -222,7 +233,7 @@ func NewSTDServer(ctx context.Context, logger log.Logger, options option.Inbound
 		}
 		if certificate == nil && key == nil && options.Insecure {
 			tlsConfig.GetCertificate = func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-				return GenerateCertificate(ntp.TimeFuncFromContext(ctx), info.ServerName)
+				return GenerateKeyPair(ntp.TimeFuncFromContext(ctx), info.ServerName)
 			}
 		} else {
 			if certificate == nil {

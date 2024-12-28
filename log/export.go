@@ -9,14 +9,7 @@ import (
 var std ContextLogger
 
 func init() {
-	std = NewDefaultFactory(
-		context.Background(),
-		Formatter{BaseTime: time.Now()},
-		os.Stderr,
-		"",
-		nil,
-		false,
-	).Logger()
+	std = NewFactory(Formatter{BaseTime: time.Now()}, os.Stderr, nil).Logger()
 }
 
 func StdLogger() ContextLogger {

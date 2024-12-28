@@ -15,8 +15,7 @@ import (
 	E "github.com/sagernet/sing/common/exceptions"
 	M "github.com/sagernet/sing/common/metadata"
 	N "github.com/sagernet/sing/common/network"
-
-	"github.com/metacubex/tfo-go"
+	"github.com/sagernet/tfo-go"
 )
 
 type slowOpenConn struct {
@@ -81,7 +80,6 @@ func (c *slowOpenConn) Write(b []byte) (n int, err error) {
 		c.conn = nil
 		c.err = E.Cause(err, "dial tcp fast open")
 	}
-	n = len(b)
 	close(c.create)
 	return
 }
